@@ -1,0 +1,15 @@
+
+(a Macronix MX25R6435F is also present on the nrf62840dk)
+
+
+64Mb flash  MX25R6435F  SPI NOR     .dev  = NRF_SPIM0,
+    CS#     P1.13  
+    SCLK    P1.11  
+    SIO0    P1.10  SI
+    SIO1    P1.14  SO
+    SIO2    P1.15  WP#
+    SIO3    P1.12  RESET# / HOLD#
+
+
+started from copy of nrf52840-mdk
+

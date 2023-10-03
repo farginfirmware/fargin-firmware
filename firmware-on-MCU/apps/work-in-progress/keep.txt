@@ -1,0 +1,70 @@
+
+goals
+    minimize error potential
+    rapid prototyping
+    program app in high level language (higher than C/C++)
+    easily ported to other MCUs and platforms
+    no bootloader - firmware (native MCU code) never needs to be upgraded
+    modify on-the-fly
+    modify remotely (e.g. via satellite)
+    app src code is on the target
+    well behaved / tame
+    does not crash
+
+design
+    no bootloader
+    RIOT OS
+        manages the hardware
+    Lua
+        RIOT OS pkg
+    C shim between RTOS and Lua
+    develop Lua on PC
+    source code stored on target flash file system
+    more app code than can fit in MCU flash
+
+others
+    eLua
+        doesn't use an underlying rtos
+        not easily ported
+    Node MCU
+    envirodiy
+        lame processor
+
+btw
+    target can be a slave from any other PC program
+        e.g. to debug hardware
+
+
+
+
+did it because it's wicked cool
+
+hardware is dirty and it has all those pointy corners so you have to insulate your app from it
+
+I'm one of those people who believe that comments can be deceiving
+
+premature optimization is the root of all evil
+
+native MCU code
+keep it simple
+
+unfortunately, the one true programming language (Smalltalk) couldn't be embedded
+
+testing just shows a gross lack of confidence
+
+metrics - right
+
+everything fixed width 
+
+developed on an old Linux laptop
+gnu
+
+
+inspiration vs perspiration
+
+public Google doc / Google site for mobile devices
+
+
+debug on PC with real target hardware
+
+

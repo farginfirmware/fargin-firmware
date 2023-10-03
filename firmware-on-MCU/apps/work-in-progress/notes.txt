@@ -1,0 +1,45 @@
+
+
+shell (usb)
+    picocom -b 115200 --imap lfcrlf /dev/ttyACM1
+app (uart)
+    picocom -b 115200 /dev/ttyACM0
+
+
+basic system
+    uart
+    no bluetooth
+    no usb
+    external flash
+    daplink would be nice
+
+
+1. program firmware into target
+    a. Lua is already running
+2. write/run Lua code on PC
+3. download to target
+
+
+serviceBuffer_printf ()
+serviceBuffer_writeStream ()
+
+
+svc buf
+    malloc bytes for response
+        void * serviceBuffer_malloc (ServiceBuffer *, uint16_t numberOfBytes) ;
+        void   serviceBuffer_printf (ServiceBuffer *, tbd)
+    receive serial stream bytes or string
+        shell commands
+
+
+svc io access via shell
+    parse input / construct request buffer
+    service request / construct response buffer
+    transmit response buffer as shell response
+
+
+lua
+    open/close port
+    send/receive via port
+
+

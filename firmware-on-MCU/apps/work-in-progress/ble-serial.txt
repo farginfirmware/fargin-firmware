@@ -1,0 +1,128 @@
+
+- Install the ble-serial tool
+
+$ pip install ble-serial
+
+- Scan for your device (device name `Riot OS device`) and note its BLE address.\
+  When you get `ble-scan: command not found` you can also run
+  python -m ble_serial.scan    instead
+
+
+$ ble-scan
+Started BLE scan
+
+6BE8174C-A0F8-4479-AFA6-9828372CAFE9 (RSSI=-40): Riot OS device
+A2862DCB-D382-4C0B-95BF-FA9A961F8D88 (RSSI=-48): Unknown
+F2C75C08-7DD7-4F43-BEF0-151C92068FE5 (RSSI=-66): Unknown
+69400683-FBE5-4B45-8CFE-98594076E5F4 (RSSI=-89): Unknown
+
+
+- Discover characteristics (check the one advertised by the gatt server stdin/stdout)
+
+$ ble-scan -d 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
+Started deep scan of 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
+
+SERVICE e6d54866-0292-4779-b8f8-c52bbec91e71 (Handle: 10): Unknown
+     CHARACTERISTIC 35f28386-3070-4f3b-ba38-27507e991762 (Handle: 11): Unknown ['indicate']
+         DESCRIPTOR 00002902-0000-1000-8000-00805f9b34fb (Handle: 13): Client Characteristic Configuration
+     CHARACTERISTIC ccdd113f-40d5-4d68-86ac-a728dd82f4aa (Handle: 14): Unknown ['write']
+
+Completed deep scan of 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
+
+
+- Create a virtual port and mount it on /tmp/dev_riot_ble
+
+$ ble-serial -d 6BE8174C-A0F8-4479-AFA6-9828372CAFE9    \
+             -p /tmp/dev_riot_ble                       \
+             --write-uuid ccdd113f-40d5-4d68-86ac-a728dd82f4aa  \
+             --read-uuid 35f28386-3070-4f3b-ba38-27507e991762
+
+17:44:18.765 | INFO | linux_pty.py: Slave created on /tmp/dev_riot_ble -> /dev/ttys006
+17:44:18.766 | INFO | ble_interface.py: Receiver set up
+17:44:18.766 | INFO | ble_interface.py: Trying to connect with 6BE8174C-A0F8-4479-AFA6-9828372CAFE9
+17:44:19.861 | INFO | ble_interface.py: Device 6BE8174C-A0F8-4479-AFA6-9828372CAFE9 connected
+17:44:19.862 | INFO | ble_interface.py: Found write characteristic ccdd113f-40d5-4d68-86ac-a728dd82f4aa (H. 14)
+17:44:19.862 | INFO | ble_interface.py: Found notify characteristic 35f28386-3070-4f3b-ba38-27507e991762 (H. 11)
+17:44:19.883 | INFO | main.py: Running main loop!
+
+
+
+- Open the virtual com port (the port name is from the logs in previous steps)
+
+$ picocom -q -b 115200 --imap lfcrlf /tmp/dev_riot_ble
+ps
+    pid | state    Q | pri
+      1 | running  Q |   7
+      2 | bl anyfl _ |   5
+      3 | bl anyfl _ |   0
+>
+
+
+
+
+
+[
+
+skip-HP:lua_basic [stdio-bluetooth] $ ble-scan -d E9:11:4E:A1:C9:0A
+Started general BLE scan
+
+...
+E0:FD:DB:AE:80:40 (RSSI=-76): E0-FD-DB-AE-80-40
+D0:03:4B:56:72:BF (RSSI=-76): D0-03-4B-56-72-BF
+3B:05:2E:A3:ED:35 (RSSI=-78): 3B-05-2E-A3-ED-35
+1B:05:26:A2:51:ED (RSSI=-78): 1B-05-26-A2-51-ED
+E9:11:4E:A1:C9:0A (RSSI=-78): LCU device
+50:DE:06:B0:35:F4 (RSSI=-78): 50-DE-06-B0-35-F4
+4D:33:27:89:37:5F (RSSI=-78): 4D-33-27-89-37-5F
+17:0B:B0:E9:27:E8 (RSSI=-78): 17-0B-B0-E9-27-E8
+7A:68:F2:41:8D:D5 (RSSI=-80): 7A-68-F2-41-8D-D5
+...
+
+Finished general BLE scan
+
+Started deep scan of E9:11:4E:A1:C9:0A
+
+Found device E9:11:4E:A1:C9:0A: LCU device (out of 1)
+/home/fxk/.local/lib/python3.10/site-packages/ble_serial/scan/main.py:30: FutureWarning: This method will be removed future version, use the services property instead.
+  return await client.get_services()
+SERVICE e6d54866-0292-4779-b8f8-c52bbec91e71 (Handle: 10): Unknown
+     CHARACTERISTIC 35f28386-3070-4f3b-ba38-27507e991762 (Handle: 11): Unknown ['indicate']
+         DESCRIPTOR 00002902-0000-1000-8000-00805f9b34fb (Handle: 13): Client Characteristic Configuration
+     CHARACTERISTIC ccdd113f-40d5-4d68-86ac-a728dd82f4aa (Handle: 14): Unknown ['write']
+SERVICE 00001801-0000-1000-8000-00805f9b34fb (Handle: 6): Generic Attribute Profile
+     CHARACTERISTIC 00002a05-0000-1000-8000-00805f9b34fb (Handle: 7): Service Changed ['indicate']
+         DESCRIPTOR 00002902-0000-1000-8000-00805f9b34fb (Handle: 9): Client Characteristic Configuration
+
+Completed deep scan of E9:11:4E:A1:C9:0A
+
+
+
+ble-serial  -d E9:11:4E:A1:C9:0A                                \
+            -p /tmp/dev_riot_ble                                \
+            --write-uuid ccdd113f-40d5-4d68-86ac-a728dd82f4aa   \
+            --read-uuid  35f28386-3070-4f3b-ba38-27507e991762
+
+14:00:19.035 | INFO | linux_pty.py: Port endpoint created on /tmp/dev_riot_ble -> /dev/pts/3
+14:00:19.036 | INFO | ble_interface.py: Receiver set up
+/home/fxk/.local/lib/python3.10/site-packages/ble_serial/bluetooth/ble_interface.py:28: FutureWarning: This method will be removed future version, pass the callback to the BleakClient constructor instead.
+  self.dev.set_disconnected_callback(self.handle_disconnect)
+14:00:19.513 | INFO | ble_interface.py: Trying to connect with E9:11:4E:A1:C9:0A: LCU device
+14:00:21.205 | INFO | ble_interface.py: Device E9:11:4E:A1:C9:0A connected
+14:00:21.206 | INFO | ble_interface.py: Found write characteristic ccdd113f-40d5-4d68-86ac-a728dd82f4aa (H. 14)
+14:00:21.206 | INFO | ble_interface.py: Found notify characteristic 35f28386-3070-4f3b-ba38-27507e991762 (H. 11)
+14:00:21.691 | INFO | main.py: Running main loop!
+...
+14:04:32.838 | WARNING | ble_interface.py: Device E9:11:4E:A1:C9:0A disconnected
+14:04:32.838 | INFO | ble_interface.py: Stopping Bluetooth event loop
+14:04:32.839 | WARNING | main.py: Shutdown initiated
+14:04:32.839 | INFO | linux_pty.py: Serial reader and symlink removed
+14:04:32.839 | INFO | main.py: Shutdown complete.
+
+
+$ picocom -q -b 115200 --imap lfcrlf /tmp/dev_riot_ble
+
+
+]
+
+
+
