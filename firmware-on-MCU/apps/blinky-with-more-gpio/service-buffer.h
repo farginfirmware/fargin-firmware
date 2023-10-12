@@ -49,7 +49,7 @@ bool serviceBuffer_getUnsigned32 (ServiceBuffer *, uint32_t * result) ;
 bool serviceBuffer_getSigned32   (ServiceBuffer *,  int32_t * result) ;
 bool serviceBuffer_getReal       (ServiceBuffer *,     Real * result) ;
 bool serviceBuffer_getString     (ServiceBuffer *,   char * * addressOfCharPtr) ;
-bool serviceBuffer_getBytes      (ServiceBuffer *,  uint8_t * dataPtr, uint16_t dataLength) ;
+bool serviceBuffer_getBytesCopy  (ServiceBuffer *,  uint8_t * dataPtr, uint16_t dataLength) ;
 
 
 bool serviceBuffer_putNil        (ServiceBuffer *) ;

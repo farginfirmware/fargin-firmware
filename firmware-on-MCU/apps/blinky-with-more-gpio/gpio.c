@@ -14,31 +14,18 @@
     #define Service_read        2
     #define Service_write       3
 
-    #define InputType_noPull    0
-    #define InputType_pullUp    1
-    #define InputType_pullDown  2
-
-    #define OutputType_pushPull                 0
-    #define OutputType_openDrain                1
-    #define OutputType_openDrainPullupEnabled   2
+    #define InputType_noPull                    0
+    #define InputType_pullUp                    1
+    #define InputType_pullDown                  2
+    #define OutputType_pushPull                 3
+    #define OutputType_openDrain                4
+    #define OutputType_openDrainPullupEnabled   5
 
 
 
 static bool getGpio (ServiceBuffer * request, gpio_t * gpioPtr)
 {
-  #if 1
-    return serviceBuffer_getBytes (request, (uint8_t *) gpioPtr, sizeof (gpio_t)) ;
-  #else
-    ServiceBufferToken token = serviceBuffer_getNextToken (request) ;
-
-    bool fault = ! (token.type == ServiceBuffer_Bytes) ||
-                 ! (token.bytes.length == sizeof (* gpioPtr)) ;
-
-    if (! fault)
-        memcpy (gpioPtr, token.bytes.ptr, sizeof (* gpioPtr)) ;
-
-    return ! fault ;
-  #endif
+    return serviceBuffer_getBytesCopy (request, (uint8_t *) gpioPtr, sizeof (gpio_t)) ;
 }
 
 
@@ -79,10 +66,31 @@ bool gpio_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 
             case Service_configure :
             {
+                gpio_t      gpio ;
+                uint8_t     ioType ;
+                gpio_mode_t mode ;
 
+                fault = ! getGpio (request, & gpio) ||
+                        ! serviceBuffer_getByte (request, & ioType) ;
 
-                // tbd
+                if (fault)
+                    break ;
 
+                switch (ioType)
+                {
+                    default : fault = true ; break ;
+
+                    case InputType_noPull                   :   mode = GPIO_IN    ;    break ;
+                    case InputType_pullUp                   :   mode = GPIO_IN_PU ;    break ;
+                    case InputType_pullDown                 :   mode = GPIO_IN_PD ;    break ;
+
+                    case OutputType_pushPull                :   mode = GPIO_OUT   ;    break ;
+                    case OutputType_openDrain               :   mode = GPIO_OD    ;    break ;
+                    case OutputType_openDrainPullupEnabled  :   mode = GPIO_OD_PU ;    break ;
+                }
+
+                if (! fault)
+                    gpio_init (gpio, mode) ;
 
                 break ;
             }
@@ -110,6 +118,7 @@ bool gpio_processRequest (ServiceBuffer * request, ServiceBuffer * response)
             {
                 gpio_t  gpio ;
                 uint8_t writeValue ;
+
                 fault = ! getGpio (request, & gpio) ||
                         ! serviceBuffer_getByte (request, & writeValue) ;
 

@@ -1,38 +1,86 @@
 
--- services (service_request() is defined in Lua.c)
-local led0 = 0
-local time = 1
-local gpio = 2
+-- services available to Lua (see service_request() in Lua.c)
+local service = {
+    -- these defs are tightly coupled to nextLevelProcessor[] in service.c
+    led0 = 0,
+    time = 1,
+    gpio = 2
+}
 
 -- led0 args
-local  off = 0
-local   on = 1
+local ledState = { off = 0, on = 1 }
 
--- gpio args
--- tbd
 
+-- gpio args (see gpio.c)
+local gpio = {
+    getHandle = 0,
+    configure = 1,
+         read = 2,
+        write = 3,
+    configureArgs = {   -- note: pin may already be configured
+            input = { noPull=0, pullUp=1, pullDown=2 },
+           output = { pushPull=3, openDrain=4, openDrainPullupEnabled=5 }
+        }
+}
+
+
+local blueLED
+local button
+
+local function blueLED_set (state)
+    service_request (service.gpio, gpio.write, blueLED, state)
+end
+
+local function buttonPressed()
+    local buttonState
+    _, buttonState = service_request (service.gpio, gpio.read, button)
+    return buttonState == 0
+end
 
 local function led0_set (state)
-    service_request (led0, state)
+    service_request (service.led0, state)
 end
 
 local function delayMilliseconds (milliseconds)
-    service_request (time, milliseconds)
+    service_request (service.time, milliseconds)
 end
 
 
 local function main()
+
+    local port, bit
+    local result
+
+    port =  0
+    bit  = 31
+    result, blueLED = service_request (service.gpio, gpio.getHandle, port, bit)
+                      service_request (service.gpio, gpio.configure, blueLED, gpio.configureArgs.output.pushPull)
+
+    port =  0
+    bit  = 19
+    result, button = service_request (service.gpio, gpio.getHandle, port, bit)
+                     service_request (service.gpio, gpio.configure, button, gpio.configureArgs.input.pullUp)
+
 
     local milliseconds_ON  =  100
     local milliseconds_OFF = 1900
 
     while true do
 
-        led0_set (on)
+        led0_set (ledState.on)
         delayMilliseconds (milliseconds_ON)
 
-        led0_set (off)
+        -- keep led0 on as long as button is pressed
+        while buttonPressed() do
+            delayMilliseconds (100)
+        end
+
+        blueLED_set (0)             -- on
+        led0_set (ledState.off)
         delayMilliseconds (milliseconds_OFF)
+
+        blueLED_set (1)             -- off
+        delayMilliseconds (1000)
 
     end
 

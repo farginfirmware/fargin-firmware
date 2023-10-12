@@ -210,7 +210,6 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
             break ;
 
         case ServiceBuffer_Bytes :          // tbd handle zero termination
-
             dataPtr    = (uint8_t *) & data.bytes.length ;
             dataLength =       sizeof (data.bytes.length) ;
             memcpy (dataPtr, svcBuf->buffer + svcBuf->bytesRead, dataLength) ;
@@ -218,6 +217,9 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
 
             data.bytes.ptr = svcBuf->buffer + svcBuf->bytesRead ;
             svcBuf->bytesRead += data.bytes.length ;
+          #if 1
+            -- data.bytes.length ;          // exclude zero termination!!
+          #endif
 
             break ;
     }
@@ -350,7 +352,7 @@ bool serviceBuffer_getString (ServiceBuffer * svcBuf, char * * addressOfCharPtr)
 
 
 
-bool serviceBuffer_getBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLength)
+bool serviceBuffer_getBytesCopy (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLength)
 {
     bool fault = false ;
 
