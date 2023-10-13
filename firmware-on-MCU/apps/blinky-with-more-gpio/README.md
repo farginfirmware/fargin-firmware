@@ -1,18 +1,35 @@
 
-This "blinky" app is intended to run on any RIOT OS board which defines LED0.
-(Most boards have at least LED0.) Some small MCUs might not have enough CODE or
-DATA space to work (Lua takes a lot of both).
+This 'blinky-with-more-gpio' builds upon the 'blinky' app in two important
+ways:
+ - any gpio may be initialized and configured by Lua ; in this case:
+   - a button
+   - a 2nd LED (i.e. in addition to LED0)
+ - gpio service requests return values which Lua needs
+   - get button handle and configure it as an input with a pull up
+   - get handle for 2nd LED and configure it as a push-pull output
 
-This is a small, but important, first step. In particular, it introduces the
-concept of service buffers. Service request buffers are used to get service
-from the OS. An associated response buffer will have a result indication and
-may contain response data. In this example, Lua sends requests for LED0 and
-time services, but does not yet do anything with service responses.
+Unlike LED0, the button and 2nd LED are not already part of the board
+definition. You must initialize and configure them in main.lua using the port
+numbers and bit numbers for your board. This is the setup for my board:
 
-app info:
- - single-threaded
- - no Lua co-routines
+```
+port =  0
+bit  = 19
+result, button = service_request (service.gpio, gpio.getHandle, port, bit)
+                 service_request (service.gpio, gpio.configure, button, gpio.configureArgs.input.pullUp)
+```
+
+Notice that the first call to service_request() above saves the values returned
+by the service request.
+ - "result" indicates whether or not the call succeeded
+ - "button" is the handle for subsequent button functions provided the call succeeded
+
+(I so appreciate functions which return multiple values!)
+
+
+summary:
+ - native MCU code is single-threaded
+ - Lua app is also single-threaded (i.e. no co-routines yet)
  - tested on a
     [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
-    (which is not currently a stock RIOT OS board)
 

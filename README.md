@@ -4,11 +4,11 @@ This repository is for the development (in progress) of the
 [FarginFirmware](http://www.farginFirmware.com) architecture
 for microcontroller-based embedded systems.
 
-FarginFirmware is built on the shoulders of [Lua](http://www.lua.org) and
+FarginFirmware is built on top of [Lua](http://www.lua.org) and
 [RIOT OS](http://www.riot-os.org) ("The friendly Operating System for the Internet of Things").
 
 - RIOT OS handles the mcu and board hardware
-- Lua handles application complexity
+- Lua handles the application
 
 What's so ~~great~~ ~~special~~ different about this firmware?
 
@@ -18,11 +18,11 @@ What's so ~~great~~ ~~special~~ different about this firmware?
   - and a high degree of testability
   - written entirely in C
   - highly portable
-  - bootloader not needed
+  - obviates the need for a bootloader
 
 - the application is written in Lua
-  - interpreter and bytecode compiler are built into the firmware
-  - app source is stored in a file system on the target
+  - bytecode compiler and interpreter are built into the firmware
+  - application source is stored in a file system on the target
   - may be modified on-the-fly (i.e. without having to do a reset)
 
 - Lua app development is on a PC
@@ -31,16 +31,17 @@ What's so ~~great~~ ~~special~~ different about this firmware?
   - load your Lua code into the pc app
   - execute the code
     - service requests are sent to the target
-    - service responses are returned to the pc
+    - the target returns service responses to the pc
   - download Lua source to the target for subsequent stand-alone running
 
 
-current branches
+examples in folder firmware-on-MCU/apps
 - blinky
 - blinky-with-more-gpio
-- tbd (in progress)
+- etc (in progress)
 
 external references:
 - [RIOT OS 2023.07](https://github.com/RIOT-OS/RIOT/tree/2023.07-branch) which includes
 - a [Lua 5.3](https://www.lua.org/versions.html#5.3) package
+
 
