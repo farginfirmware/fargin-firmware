@@ -38,6 +38,7 @@ What's so ~~great~~ ~~special~~ different about this firmware?
 examples in folder firmware-on-MCU/apps
 - blinky
 - blinky-with-more-gpio
+- threads-and-coroutines
 - etc (in progress)
 
 external references:

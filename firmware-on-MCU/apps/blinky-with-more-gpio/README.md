@@ -10,7 +10,7 @@ ways:
 
 Unlike LED0, the button and 2nd LED are not already part of the board
 definition. You must initialize and configure them in main.lua using the port
-numbers and bit numbers for your board. This is the setup for my board:
+numbers and bit numbers for your board. This is the setup for the button for my board:
 
 ```
 port =  0

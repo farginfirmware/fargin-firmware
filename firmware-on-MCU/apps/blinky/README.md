@@ -7,7 +7,7 @@ of both).
 
 This is a small, but important, first step. In particular, it introduces the
 concept of service buffers. Service request buffers are used to request service
-from the OS. An associated response buffer minimally a result indication and
+from the OS. An associated response buffer returns minimally a result indication and
 may contain response data. In this example, Lua sends requests for LED0 and
 time services, but does not yet do anything with service responses.
 
