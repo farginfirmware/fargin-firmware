@@ -11,8 +11,14 @@ from the OS. An associated response buffer returns minimally a result indication
 may contain response data. In this example, Lua sends requests for LED0 and
 time services, but does not yet do anything with service responses.
 
-summary:
- - native MCU code is single-threaded
- - Lua app is also single-threaded (i.e. no co-routines yet)
- - tested on a
-    [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
+native MCU firmware
+ - single-threaded (Lua interpreter)
+ - service request and response buffers
+
+interpreted Lua app
+ - single-threaded (i.e. no co-routines yet)
+ - "LED0" is directly accessible
+
+test platform
+ - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
+

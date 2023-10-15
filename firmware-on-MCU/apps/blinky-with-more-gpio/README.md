@@ -27,9 +27,15 @@ by the service request.
 (I so appreciate functions which return multiple values!)
 
 
-summary:
- - native MCU code is single-threaded
- - Lua app is also single-threaded (i.e. no co-routines yet)
- - tested on a
-    [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
+
+native MCU firmware
+ - single-threaded (Lua interpreter)
+ - service request and response buffers
+
+interpreted Lua app
+ - single-threaded (i.e. no co-routines yet)
+ - "LED0" is directly accessible
+
+test platform
+ - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
 

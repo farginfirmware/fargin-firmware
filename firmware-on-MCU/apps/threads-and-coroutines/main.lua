@@ -32,17 +32,8 @@ local function delayMilliseconds (milliseconds)
 end
 
 
-local function blink (led, millisecondsOn)
-    while true do
-        coroutine.yield ()
-        led.set (0)
-        delayMilliseconds (millisecondsOn)
-        led.set (1)
-        delayMilliseconds (500)
-    end
-end
-
-
+-- this is the prototype for the red, green and blue LEDs
+-- it is analogous to an object-oriented class definition
 local LED = {
     new = function (self, port, bit)
         led = {}    -- create the instance
@@ -62,58 +53,47 @@ local LED = {
 }
 
 
-local function main()
+local function blink (led, millisecondPeriod, dutyCycle)
 
---[[
-
-    local green = {}
-
-    _, green.handle = service_request (service.gpio, gpio.getHandle, 0, 29)
-
-    service_request (service.gpio, gpio.configure, green.handle, gpio.configureArgs.output.pushPull)
+    local milliseconds_ON  = millisecondPeriod * dutyCycle
+    local milliseconds_OFF = millisecondPeriod - milliseconds_ON
 
     while true do
-        service_request (service.gpio, gpio.write, green.handle, 0)
-        delayMilliseconds (500)
-        service_request (service.gpio, gpio.write, green.handle, 1)
-        delayMilliseconds (1000)
+        coroutine.yield ()
+        led:set (0)     delayMilliseconds (milliseconds_ON)
+        led:set (1)     delayMilliseconds (milliseconds_OFF)
     end
+end
 
-]]
 
+local function main()
 
     local red   = LED:new (0, 30)
     local green = LED:new (0, 29)
     local blue  = LED:new (0, 31)
 
+    local allLeds = { red, green, blue }
+
+    local blink_RED   = coroutine.create (blink)
+    local blink_GREEN = coroutine.create (blink)
+    local blink_BLUE  = coroutine.create (blink)
+
+    local allBlink = { blink_RED, blink_GREEN, blink_BLUE}
+
+    coroutine.resume (blink_RED,     red,  500, 0.25)
+    coroutine.resume (blink_GREEN, green, 1000, 0.25)
+    coroutine.resume (blink_BLUE,   blue, 1500, 0.25)
 
     while true do
 
-        red:set (0)
-        delayMilliseconds (500)
-        red:set (1)
+        -- blink 1 at a time
+        for _, blink in ipairs (allBlink) do coroutine.resume (blink) end
 
-        green:set (0)
-        delayMilliseconds (500)
-        green:set (1)
+        -- turn them all on
+        for _, led in ipairs (allLeds) do led:set (0) end   delayMilliseconds (2000)
 
-        blue:set (0)
-        delayMilliseconds (500)
-        blue:set (1)
-
-        delayMilliseconds (1000)
-
-          red:set (0)
-        green:set (0)
-         blue:set (0)
-
-        delayMilliseconds (1000)
-
-          red:set (1)
-        green:set (1)
-         blue:set (1)
-
-        delayMilliseconds (1000)
+        -- turn them all off
+        for _, led in ipairs (allLeds) do led:set (1) end   delayMilliseconds (1000)
 
     end
 

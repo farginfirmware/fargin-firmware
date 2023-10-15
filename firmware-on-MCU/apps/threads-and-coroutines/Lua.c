@@ -17,7 +17,7 @@
 #include "time.h"
 
 
-#define LUA_MEM_SIZE  (20000)       // TBD ... 10000 does not work!
+#define LUA_MEM_SIZE  (30000)       // TBD
 static char lua_mem [LUA_MEM_SIZE] __attribute__  ((aligned (__BIGGEST_ALIGNMENT__))) ;
 
 
@@ -256,7 +256,7 @@ static void * lua_thread (void * arg)
 
 int Lua_initialize (void)
 {
-    static char         stack [2048] ;                          // tbd size
+    static char         stack [4096] ;                          // TBD
     uint8_t             priority =  THREAD_PRIORITY_IDLE - 1 ;  // lowest possible priority
     int                 flags    =  THREAD_CREATE_STACKTEST ;
     thread_task_func_t  task     =  lua_thread ;
