@@ -39,6 +39,7 @@ examples in folder firmware-on-MCU/apps
 - blinky
 - blinky-with-more-gpio
 - threads-and-coroutines
+- service-via-serial
 - etc (in progress)
 
 external references:
