@@ -80,14 +80,16 @@ local function main()
 
     local allBlink = { blink_RED, blink_GREEN, blink_BLUE}
 
-    coroutine.resume (blink_RED,     red,  500, 0.25)
-    coroutine.resume (blink_GREEN, green, 1000, 0.25)
-    coroutine.resume (blink_BLUE,   blue, 1500, 0.25)
+    coroutine.resume (blink_RED,     red, 1000, 0.05)
+    coroutine.resume (blink_GREEN, green, 1000, 0.10)
+    coroutine.resume (blink_BLUE,   blue, 1000, 0.15)
 
     while true do
 
         -- blink 1 at a time
         for _, blink in ipairs (allBlink) do coroutine.resume (blink) end
+
+        delayMilliseconds (1000)
 
         -- turn them all on
         for _, led in ipairs (allLeds) do led:set (0) end   delayMilliseconds (2000)
