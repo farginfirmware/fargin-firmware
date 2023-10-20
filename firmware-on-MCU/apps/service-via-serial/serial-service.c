@@ -4,6 +4,12 @@
 #include "service-buffer.h"
 
 
+
+/// tbd - handle checksum
+
+
+
+
 #if 0
 
     2 modes
@@ -85,17 +91,17 @@ static void tx_Bitfield32 (TxFunctionPtr txFn, uint32_t data)
 {
     // do not tx leading 0's
 
-    bool leadingZero = true ;
+    bool suppressLeadingZeroes = true ;
 
     uint8_t nybbleNumber = 2 * sizeof (data) ;
     while (nybbleNumber --)
     {
         uint8_t nybble = (data >> (4 * nybbleNumber)) & 0xf ;
 
-        if (leadingZero && (nybble == 0))
+        if (suppressLeadingZeroes && (nybble == 0) && (nybbleNumber > 0))
             continue ;
 
-        leadingZero = false ;
+        suppressLeadingZeroes = false ;
 
         txFn (hexDigits [nybble]) ;
     }
@@ -185,6 +191,20 @@ static void tx_Bytes (TxFunctionPtr txFn, uint8_t * dataPtr, uint16_t dataLength
 }
 
 
+static void tx_Checksum (TxFunctionPtr txFn, uint16_t checksum)
+{
+    (void) txFn ;
+    (void) checksum ;
+
+    txFn (' ') ;
+    txFn (Prefix_Checksum) ;
+
+    tx_Bitfield32 (txFn, checksum) ;
+
+    txFn ('\r') ;
+}
+
+
 
 bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFn)
 {
@@ -192,7 +212,7 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFn)
 
     bool fault = false ;
 
-/// uint16_t checksum = 0 ;
+    uint16_t checksum = 0 ;
 
     while (! fault)
     {
@@ -202,9 +222,7 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFn)
         {
             default                       : fault = true ;  break ;
 
-            case ServiceBuffer_End        :
-                // tbd
-                break ;
+            case ServiceBuffer_End        : tx_Checksum   (txFn, checksum) ;            break ;
 
             case ServiceBuffer_Nil        : tx_Nil        (txFn) ;                      break ;
 
