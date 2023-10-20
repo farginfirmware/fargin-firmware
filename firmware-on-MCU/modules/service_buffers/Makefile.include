@@ -1,0 +1,4 @@
+
+USEMODULE_INCLUDES_service_buffers := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_service_buffers)
+

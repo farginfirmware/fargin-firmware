@@ -1,7 +1,16 @@
 #ifndef _SERIAL_SERVICE_IO_H_
 #define _SERIAL_SERVICE_IO_H_
 
-#include "project.h"
+
+#if 1
+    #include "project.h"
+#else
+    #include <limits.h>
+    #include <stdbool.h>
+    #include <stdint.h>
+    typedef double Real ;
+#endif
+
 
 #include "service-buffer.h"
 
@@ -12,4 +21,3 @@ bool serialService_receive  (ServiceBuffer *, RxFunctionPtr) ;
 bool serialService_transmit (ServiceBuffer *, TxFunctionPtr) ;
 
 #endif
-

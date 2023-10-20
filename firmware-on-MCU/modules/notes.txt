@@ -1,0 +1,16 @@
+
+
+    ├── apps
+    │   └── my_app
+    │       └── Makefile
+    ├── boards
+    │   └── my_board
+    ├── modules
+    │   └── my_module
+    │       ├── include
+    │       │   └── my_module.h
+    │       ├── Makefile
+    │       ├── Makefile.include
+    │       └── my_module.c
+    └── RIOT
+
