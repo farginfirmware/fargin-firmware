@@ -1,9 +1,9 @@
 
 APPLICATION = blinky
 
-# If no BOARD is found in the environment, use this default:
-#BOARD ?= native
-EXTERNAL_BOARD_DIRS ?= ../../boards/
+EXTERNAL_MODULE_DIRS ?= ../../modules/
+EXTERNAL_BOARD_DIRS  ?= ../../boards/
+
 BOARD ?= makerdiary-nrf52840-m2-kit
 
 # This has to be the absolute path to the RIOT base directory:
@@ -49,6 +49,8 @@ USEMODULE += vfs_auto_format                        ### commenting out lets the 
 ## USEMODULE += nimble_autoadv
 ## CFLAGS += -DCONFIG_NIMBLE_AUTOADV_DEVICE_NAME='"LCU device"'
 
+
+USEMODULE += service_buffers
 
 USEPKG += lua
 USEPKG += littlefs2
