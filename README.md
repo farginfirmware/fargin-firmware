@@ -1,7 +1,7 @@
 # Fargin Firmware
 
 This repository is for the development (in progress) of the
-[FarginFirmware](http://www.farginFirmware.com) architecture
+[FarginFirmware](http://www.farginFirmware.com) framework
 for microcontroller-based embedded systems.
 
 FarginFirmware is built on top of [Lua](http://www.lua.org) and
