@@ -1,8 +1,8 @@
 
 service-via-serial
 
-With this app, a **major** feature of the FarginFirmware architecture is
-introduced - namely the ability to invoke native mcu services via a serial
+With this app, a **major** feature of the FarginFirmware framework is
+in place - namely the ability to invoke native mcu services via a serial
 interface.
 
 If you have the ability to invoke mcu services via a serial interface, then you
@@ -14,8 +14,8 @@ have:
    always software - sometimes it's hardware)
 
 
-Being able to test/debug native code via a serial interface will be invaluable
-going forward when developing new native code services.
+Being able to test/debug native mcu code via a serial interface will be
+invaluable going forward when developing new native code services.
 
 Likewise, the ability to develop Lua code on a pc provides for rapid app
 development.
@@ -37,8 +37,8 @@ mcu service requests/responses via a serial interface
 works concurrently with Lua service requests
 
 this protocol could also be used without Lua
-    a client mcu could talk to a server mcu
-
+    a client mcu could talk to a server mcu (particularly one which runs only
+    native code - i.e. no Lua)
 
 
 

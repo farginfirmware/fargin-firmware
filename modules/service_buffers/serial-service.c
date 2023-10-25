@@ -1,12 +1,11 @@
 
 #include "serial-service.h"
 
+#include "character.h"
 #include "service-buffer.h"
 
 
-
 /// tbd - handle checksum
-
 
 
 
@@ -62,23 +61,67 @@
 #define Prefix_No         'n'
 #define Prefix_Checksum   'c'
 
-
-static const char * hexDigits = "0123456789ABCDEF" ;
-
+#define MessagePrefix     '>'
 
 
-bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFn)
+typedef struct {
+    RxFunctionPtr  rxFn ;
+    TxFunctionPtr  txFn ;
+    uint16_t       checksum ;
+} SerialSvcTxfr ;
+
+
+
+static void txChar (SerialSvcTxfr * txfr, char tx)
 {
-    (void) svcBuf ;
-    (void) rxFn ;
+    txfr->txFn (tx) ;
+    txfr->checksum += tx ;
+}
+
+
+#if 0
+static void txString (SerialSvcTxfr * txfr, char * tx)
+{
+    while (* tx)
+        txChar (txfr, * tx ++) ;
+}
+#endif
+
+
+static char rxChar (SerialSvcTxfr * txfr)
+{
+    char rx = txfr->rxFn() ;
+    txfr->checksum += rx ;
+    return rx ;
+}
+
+
+
+bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
+{
+    SerialSvcTxfr txfr ;
+    txfr.rxFn = rxFnPtr ;
 
     bool fault = false ;
 
     serviceBuffer_reset (svcBuf) ;
 
+    // wait for the message prefix
+    while (1)
+    {
+        txfr.checksum = 0 ;
+        if (rxChar (& txfr) == MessagePrefix)
+            break ;
+    }
+
+
+
+
 
 
     // tbd
+
+
 
 
 
@@ -87,7 +130,7 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFn)
 
 
 
-static void tx_Bitfield32 (TxFunctionPtr txFn, uint32_t data)
+static void tx_Bitfield32 (SerialSvcTxfr * txfr, uint32_t data)
 {
     // do not tx leading 0's
 
@@ -103,23 +146,23 @@ static void tx_Bitfield32 (TxFunctionPtr txFn, uint32_t data)
 
         suppressLeadingZeroes = false ;
 
-        txFn (hexDigits [nybble]) ;
+        txChar (txfr, character_hexDigitFromNybble (nybble)) ;
     }
 }
 
 
-static void tx_Unsigned32 (TxFunctionPtr txFn, uint32_t data)
+static void tx_Unsigned32 (SerialSvcTxfr * txfr, uint32_t data)
 {
-    txFn (' ') ;
-    txFn (Prefix_Unsigned) ;
-    tx_Bitfield32 (txFn, data) ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, Prefix_Unsigned) ;
+    tx_Bitfield32 (txfr, data) ;
 }
 
 
-static void tx_Signed32 (TxFunctionPtr txFn, int32_t data)
+static void tx_Signed32 (SerialSvcTxfr * txfr, int32_t data)
 {
-    txFn (' ') ;
-    txFn (Prefix_Signed) ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, Prefix_Signed) ;
 
     uint32_t unsignedData = (uint32_t) data ;
 
@@ -141,78 +184,81 @@ static void tx_Signed32 (TxFunctionPtr txFn, int32_t data)
         unsignedData ^= 0xf << (4 * nybbleNumber) ;
     }
 
-    tx_Bitfield32 (txFn, unsignedData) ;
+    tx_Bitfield32 (txfr, unsignedData) ;
 }
 
 
-static void tx_Real (TxFunctionPtr txFn, Real data)
+static void tx_Real (SerialSvcTxfr * txfr, Real data)
 {
     uint8_t * bytePtr = (uint8_t *) & data ;
 
-    txFn (' ') ;
-    txFn (Prefix_Real) ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, Prefix_Real) ;
 
     uint8_t nybbleNumber = 2 * sizeof (data) ;
 
     while (nybbleNumber --)
     {
-        txFn (hexDigits [* bytePtr >>  4]) ;
-        txFn (hexDigits [* bytePtr & 0xf]) ;
+        txChar (txfr, character_hexDigitFromNybble (* bytePtr >>  4)) ;
+        txChar (txfr, character_hexDigitFromNybble (* bytePtr & 0xf)) ;
         ++ bytePtr ;
     }
 }
 
 
-static void tx_Boolean (TxFunctionPtr txFn, bool data)
+static void tx_Boolean (SerialSvcTxfr * txfr, bool data)
 {
-    txFn (' ') ;
-    txFn (data ? Prefix_Yes : Prefix_No) ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, data ? Prefix_Yes : Prefix_No) ;
 }
 
 
-static void tx_Nil (TxFunctionPtr txFn)
+static void tx_Nil (SerialSvcTxfr * txfr)
 {
-    txFn (' ') ;
-    txFn (Prefix_No) ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, Prefix_No) ;
 }
 
 
-static void tx_Bytes (TxFunctionPtr txFn, uint8_t * dataPtr, uint16_t dataLength)
+static void tx_Bytes (SerialSvcTxfr * txfr, uint8_t * dataPtr, uint16_t dataLength)
 {
-    txFn (' ') ;
-    txFn (Prefix_Bytes) ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, Prefix_Bytes) ;
 
     while (dataLength --)
     {
-        txFn (hexDigits [* dataPtr >>  4]) ;
-        txFn (hexDigits [* dataPtr & 0xf]) ;
+        txChar (txfr, character_hexDigitFromNybble (* dataPtr >>  4)) ;
+        txChar (txfr, character_hexDigitFromNybble (* dataPtr & 0xf)) ;
         ++ dataPtr ;
     }
 }
 
 
-static void tx_Checksum (TxFunctionPtr txFn, uint16_t checksum)
+static void tx_Checksum (SerialSvcTxfr * txfr)
 {
-    (void) txFn ;
-    (void) checksum ;
+    txChar (txfr, ' ') ;
+    txChar (txfr, Prefix_Checksum) ;
 
-    txFn (' ') ;
-    txFn (Prefix_Checksum) ;
+    uint16_t checksumCopy = txfr->checksum ;
 
-    tx_Bitfield32 (txFn, checksum) ;
+    tx_Bitfield32 (txfr, checksumCopy) ;
 
-    txFn ('\r') ;
+    txChar (txfr, '\r') ;
 }
 
 
 
-bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFn)
+bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr)
 {
     // this is going to be a lot easier than the complementary receive function
 
+    SerialSvcTxfr txfr ;
+    txfr.txFn = txFnPtr ;
+    txfr.checksum = 0 ;
+
     bool fault = false ;
 
-    uint16_t checksum = 0 ;
+    txChar (& txfr, MessagePrefix) ;
 
     while (! fault)
     {
@@ -222,18 +268,18 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFn)
         {
             default                       : fault = true ;  break ;
 
-            case ServiceBuffer_End        : tx_Checksum   (txFn, checksum) ;            break ;
+            case ServiceBuffer_End        : tx_Checksum   (& txfr) ;                      break ;
 
-            case ServiceBuffer_Nil        : tx_Nil        (txFn) ;                      break ;
+            case ServiceBuffer_Nil        : tx_Nil        (& txfr) ;                      break ;
 
-            case ServiceBuffer_Boolean    : tx_Boolean    (txFn, token.boolean != 0) ;  break ;
+            case ServiceBuffer_Boolean    : tx_Boolean    (& txfr, token.boolean != 0) ;  break ;
 
-            case ServiceBuffer_Unsigned32 : tx_Unsigned32 (txFn, token.unsigned32) ;    break ;
-            case ServiceBuffer_Signed32   : tx_Signed32   (txFn, token.  signed32) ;    break ;
-            case ServiceBuffer_Real       : tx_Real       (txFn, token.      real) ;    break ;
+            case ServiceBuffer_Unsigned32 : tx_Unsigned32 (& txfr, token.unsigned32) ;    break ;
+            case ServiceBuffer_Signed32   : tx_Signed32   (& txfr, token.  signed32) ;    break ;
+            case ServiceBuffer_Real       : tx_Real       (& txfr, token.      real) ;    break ;
 
             case ServiceBuffer_Bytes      :
-                tx_Bytes (txFn, token.bytes.ptr, token.bytes.length) ;
+                tx_Bytes (& txfr, token.bytes.ptr, token.bytes.length) ;
                 break ;
         }
     }

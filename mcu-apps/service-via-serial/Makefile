@@ -15,12 +15,17 @@ ifneq ($(BOARD),native)
 endif
 
 USEMODULE += periph_uart
+
+#FarginFirmware modules
 USEMODULE += service_buffers
+USEMODULE += app_independent_utils
 
 USEPKG += lua
 
 # generate .lua.h header files of .lua files
 BLOBS += $(wildcard *.lua)
 
+
+# this must be the last directive in this file
 include $(RIOTBASE)/Makefile.include
 

@@ -1,5 +1,0 @@
-
-ctags   *.h    *.c                                  \
-        ../../modules/service_buffers/include/*.h   \
-        ../../modules/service_buffers/*.c           \
-

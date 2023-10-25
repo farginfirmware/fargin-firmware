@@ -1,0 +1,10 @@
+
+
+serialService_receive  ()
+serialService_transmit ()
+
+
+_SERIAL_SERVICE_IO_H_
+_CHARACTER_INCLUDED_
+
+
