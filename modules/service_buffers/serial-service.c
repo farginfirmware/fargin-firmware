@@ -4,9 +4,7 @@
 #include "character.h"
 #include "service-buffer.h"
 
-
-/// tbd - handle checksum
-
+#include <string.h>
 
 
 #if 0
@@ -96,6 +94,119 @@ static char rxChar (SerialSvcTxfr * txfr)
 }
 
 
+static bool rxHexString (SerialSvcTxfr * txfr, char * digitString, uint8_t maxLength)
+{
+    bool fault = false ;
+
+    if (maxLength < 2)
+        return false ;
+
+    uint8_t length = 0 ;
+
+    while (! fault && (length < maxLength - 1))
+    {
+        char nextChar = character_toLower (rxChar (txfr)) ;
+
+        if (nextChar == ' ')
+            break ;
+
+        fault = ! character_isHexDigit (nextChar) ;
+
+        if (! fault)
+        {
+            digitString [length ++] = nextChar ;
+            digitString [length   ] = 0 ;
+        }
+    }
+
+    fault |= length < 1 ;
+
+    return ! fault ;
+}
+
+
+static bool rxUnsigned (SerialSvcTxfr * txfr, uint32_t * data)
+{
+    // receive 1 to 8 hex characters followed by a space
+
+    bool fault = false ;
+
+    char hexString [2 * sizeof (* data) + 1] ;
+
+    if (! rxHexString (txfr, hexString, sizeof (hexString)))
+        return ! (fault = true) ;
+
+    char *   inPtr   = hexString ;
+    uint32_t inValue = 0 ;
+
+    while (* inPtr)
+        inValue = (inValue << 4) + character_hexValue (* inPtr ++) ;
+
+    * data = inValue ;
+
+    return ! fault ;
+}
+
+
+static bool rxSigned (SerialSvcTxfr * txfr, int32_t * data)
+{
+    // receive 1 to 8 hex characters followed by a space
+
+    bool fault = false ;
+
+    char hexString [2 * sizeof (* data) + 1] ;
+
+    if (! rxHexString (txfr, hexString, sizeof (hexString)))
+        return ! (fault = true) ;
+
+    char *  inPtr   = hexString ;
+    int32_t inValue = 0 ;
+
+    // the MS bit of the 1st nybble determines the sign of the result
+    if (character_hexValue (* inPtr) & 0x8)
+        inValue = -1 ;
+
+    while (* inPtr)
+        inValue = (inValue << 4) + character_hexValue (* inPtr ++) ;
+
+    * data = inValue ;
+
+    return ! fault ;
+}
+
+
+static bool rxReal (SerialSvcTxfr * txfr, Real * data)
+{
+    // receive exactly (2 * sizeof(Real) hex characters followed by a space
+
+    bool fault ;
+
+    char hexString [2 * sizeof (* data) + 1] ;
+
+    fault = ! rxHexString (txfr, hexString, sizeof (hexString)) ||
+            ! (strlen (hexString) == 2 * sizeof (* data)) ;
+
+    if (fault)
+        return ! fault ;
+
+    char *    inPtr = hexString ;
+    Real      inValue ;
+    uint8_t * inValuePtr = (uint8_t *) & inValue ;
+
+    while (* inPtr)
+    {
+        uint8_t aByte =                character_hexValue (* inPtr ++) ;
+                aByte = (aByte << 4) + character_hexValue (* inPtr ++) ;
+
+        * inValuePtr ++ = aByte ;
+    }
+
+    * data = inValue ;
+
+    return ! fault ;
+}
+
+
 
 bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
 {
@@ -115,14 +226,71 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
     }
 
 
+    while (! fault)
+    {
+        char prefix = character_toLower (rxChar (& txfr)) ;
 
+        switch (prefix)
+        {
+            default  :  fault = true ;  break ;
+            case ' ' :                  break ;
 
+            case Prefix_Unsigned :
+            {
+                uint32_t data ;
+                fault = ! rxUnsigned (& txfr, & data) ||
+                        ! serviceBuffer_putUnsigned32 (svcBuf, data) ;
+                break ;
+            }
+
+            case Prefix_Signed :
+            {
+                int32_t data ;
+                fault = ! rxSigned (& txfr, & data) ||
+                        ! serviceBuffer_putSigned32 (svcBuf, data) ;
+                break ;
+            }
+
+            case Prefix_Real :
+            {
+                Real data ;
+                fault = ! rxReal (& txfr, & data) ||
+                        ! serviceBuffer_putReal (svcBuf, data) ;
+                break ;
+            }
+
+            case Prefix_Bytes :
+            {
+/*
+bool serviceBuffer_putBytes      (ServiceBuffer *, uint8_t * bytes, uint16_t numberOfBytes) ;
+bool serviceBuffer_putString     (ServiceBuffer *, char *) ;       // zero-terminated
+*/
+                break ;
+            }
+
+            case Prefix_Yes :
+                fault = ! serviceBuffer_putBoolean (svcBuf, true) ||
+                        ! (rxChar (& txfr) == ' ') ;
+                break ;
+
+            case Prefix_No :
+                fault = ! serviceBuffer_putBoolean (svcBuf, false) ||
+                        ! (rxChar (& txfr) == ' ') ;
+                break ;
+
+            case Prefix_Checksum :
+            {
+
+                // tbd
+
+                break ;
+            }
+        }
+
+    }
 
 
     // tbd
-
-
-
 
 
     return ! fault ;
@@ -243,6 +411,7 @@ static void tx_Checksum (SerialSvcTxfr * txfr)
 
     tx_Bitfield32 (txfr, checksumCopy) ;
 
+    txChar (txfr, ' ') ;
     txChar (txfr, '\r') ;
 }
 
