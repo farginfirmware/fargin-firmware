@@ -154,6 +154,51 @@ bool serviceBuffer_putBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t
 }
 
 
+#if 0
+bool serviceBuffer_appendByte (ServiceBuffer * svcBuf, uint8_t aByte)
+{
+    // this assumes that serviceBuffer_putBytes() was called immediately prior
+
+    // overwrite the preceeding zero with aByte
+    // append a new terminating zero
+    // increment the data length
+
+    if (svcBuf == NULL)
+        return false ;
+
+    bool fault = false ;
+
+
+    // tbd
+
+
+
+
+typedef struct {
+    uint8_t  *  buffer ;
+    uint16_t    bytesCapacity ;
+    uint16_t    bytesWritten ;
+    uint16_t    bytesRead ;
+} ServiceBuffer ;
+
+
+
+
+
+    if (fault)
+    {
+        // restore svcBuf to its state prior to calling this function
+        svcBuf->bytesWritten = bytesWritten ;
+
+        dataLength = 0 ;
+        write (svcBuf, dataPtr, dataLength) ;
+    }
+
+    return ! fault ;
+}
+#endif
+
+
 bool serviceBuffer_putString (ServiceBuffer * svcBuf, char * dataPtr)
 {
     return serviceBuffer_putBytes (svcBuf, (uint8_t *) dataPtr, strlen (dataPtr)) ;

@@ -208,6 +208,46 @@ static bool rxReal (SerialSvcTxfr * txfr, Real * data)
 
 
 
+static bool rxBytes (SerialSvcTxfr * txfr, ServiceBuffer * svcBuf)
+{
+    // rx even number of hex digits
+    // minimum 2 (i.e. at least 1 byte)
+    // write received data directly to svcBuf
+
+    bool fault = false ;
+
+    uint16_t byteCount = 0 ;
+
+    while (! fault)
+    {
+        char in [2] ;
+
+        in [0] = rxChar (txfr) ;
+        if (in [0] == ' ')
+            break ;
+        fault = ! character_isHexDigit (in [0]) ;
+        if (fault)
+            break ;
+
+        in [1] = rxChar (txfr) ;
+        fault = ! character_isHexDigit (in [1]) ;
+        if (fault)
+            break ;
+
+        uint8_t aByte = (character_hexValue (in [0]) << 4) +
+                         character_hexValue (in [1]) ;
+
+        if (++ byteCount == 1)
+            fault = ! serviceBuffer_putBytes (svcBuf, & aByte, sizeof (aByte)) ;
+        else
+            fault = ! serviceBuffer_appendByte (svcBuf, aByte) ;
+    }
+
+    return ! fault ;
+}
+
+
+
 bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
 {
     SerialSvcTxfr txfr ;
@@ -260,13 +300,8 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
             }
 
             case Prefix_Bytes :
-            {
-/*
-bool serviceBuffer_putBytes      (ServiceBuffer *, uint8_t * bytes, uint16_t numberOfBytes) ;
-bool serviceBuffer_putString     (ServiceBuffer *, char *) ;       // zero-terminated
-*/
+                fault = ! rxBytes (& txfr, svcBuf) ;
                 break ;
-            }
 
             case Prefix_Yes :
                 fault = ! serviceBuffer_putBoolean (svcBuf, true) ||

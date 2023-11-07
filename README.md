@@ -35,7 +35,7 @@ What's so ~~great~~ ~~special~~ different about this firmware?
   - download Lua source to the target for subsequent stand-alone running
 
 
-examples in folder firmware-on-MCU/apps
+examples in folder mcu-apps/
 - blinky
 - blinky-with-more-gpio
 - threads-and-coroutines

@@ -1,5 +1,5 @@
 
-MODULE := service_buffers
+MODULE := fargin_framework
 
 include $(RIOTBASE)/Makefile.base
 

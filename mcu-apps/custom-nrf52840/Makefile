@@ -1,8 +1,10 @@
 
-APPLICATION = service-via-serial
+APPLICATION = custom-nrf52840
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
+
+BOARD ?= custom-nrf52840
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of
@@ -21,7 +23,5 @@ USEPKG += lua
 # generate .lua.h header files of .lua files
 BLOBS += $(wildcard *.lua)
 
-
-# this must be the last directive in this file
 include $(RIOTBASE)/Makefile.include
 

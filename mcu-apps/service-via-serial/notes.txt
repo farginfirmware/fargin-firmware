@@ -1,9 +1,14 @@
 
 
+* need to prefix response buffer with status
+
+
+serviceBuffer_appendByte (svcBuf, aByte) ;
 serialService_receive  ()
 serialService_transmit ()
 
 
+_SERVICE_BUFFER_H_
 _SERIAL_SERVICE_IO_H_
 _CHARACTER_INCLUDED_
 

@@ -58,6 +58,7 @@ bool serviceBuffer_putUnsigned32 (ServiceBuffer *, uint32_t) ;
 bool serviceBuffer_putSigned32   (ServiceBuffer *,  int32_t) ;
 bool serviceBuffer_putReal       (ServiceBuffer *, Real) ;
 bool serviceBuffer_putBytes      (ServiceBuffer *, uint8_t * bytes, uint16_t numberOfBytes) ;
+bool serviceBuffer_appendByte    (ServiceBuffer *, uint8_t) ;
 bool serviceBuffer_putString     (ServiceBuffer *, char *) ;       // zero-terminated
 
 void serviceBuffer_reset         (ServiceBuffer *) ;
