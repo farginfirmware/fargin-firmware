@@ -1,8 +1,11 @@
 
-local test = 0
-local time = 1
-local uart = 2
-local  i2c = 3
+-- NOTE!! these are tightly coupled to definitions in main.c
+local        test = 0
+local        time = 1
+local        uart = 2
+local         i2c = 3
+local         spi = 4
+local  ioExpander = 5
 
 local function delayMilliseconds (milliseconds)
     service_request (time, milliseconds)

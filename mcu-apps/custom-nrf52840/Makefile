@@ -13,6 +13,7 @@ ifneq ($(BOARD),native)
 endif
 
 USEMODULE += periph_uart
+USEMODULE += periph_i2c
 
 #FarginFirmware modules
 USEMODULE += fargin_framework
