@@ -2,6 +2,7 @@
 #include "io-expander.h"
 
 #include "i2c.h"
+#include "periph/i2c.h"
 
 /*
     This code is for the PCAL6416AH io expanders on the rev 2021-02-02 base board
@@ -81,7 +82,7 @@ typedef union {
 
 typedef struct {
     uint8_t     i2cAddress ;
-    uint16_t    outputCopy ;  // copy of whatever was written to the output port
+    uint16_t    outputCopy ;    // copy of whatever was written to the output port
 } Expander ;
 
 static Expander expander [NumberOfIOExpanders] = {
@@ -89,10 +90,8 @@ static Expander expander [NumberOfIOExpanders] = {
     { U22_address ,  0 }
 } ;
 
-
 #define Index_U2   0
 #define Index_U22  1
-
 
 
 typedef struct {
@@ -110,36 +109,41 @@ typedef struct {
 #define RegisterAddress_interruptMask       0x4a
 
 
-
 static void write (uint8_t _7BitAddress, uint8_t registerAddress, uint16_t bits)
 {
+//  bool fault = false ;
+
     uint8_t i2cTxfr [3] ;
     i2cTxfr [0] = registerAddress ;
+
     i2cTxfr [1] = bits  & 0xff ;
     i2cTxfr [2] = bits >>    8 ;
-/// * ((uint16_t *) & i2cTxfr [1]) = bits ;         tbd order above
+/// * ((uint16_t *) & i2cTxfr [1]) = bits ;         tbd order of above
 
-    // use low-level api
-
+#if 1
+    i2c_acquire (i2cDevice) ;
+    uint8_t flags = 0 ;
+    i2c_write_bytes (i2cDevice, _7BitAddress, i2cTxfr, sizeof (i2cTxfr), flags) ;
+    i2c_release (i2cDevice) ;
+#else
     i2c_open (i2cDevice) ;
 
+    I2CAddressNumBits numAddrBits = 7 ;
     bool write = true ;
+    bool stop  = true ;
 
-    i2c_sendStart (i2cDevice, _7BitAddress, write) ;
-
-    i2c_writeByte (i2cDevice, i2cTxfr [0]) ;
-    i2c_writeByte (i2cDevice, i2cTxfr [1]) ;
-    i2c_writeByte (i2cDevice, i2cTxfr [2]) ;
-
-    i2c_sendStop (i2cDevice) ;
+    fault |= ! i2c_txStart (i2cDevice, numAddrBits, _7BitAddress, write) ;
+    fault |= ! i2c_write   (i2cDevice, i2cTxfr, ArrayLength (i2cTxfr), stop) ;
 
     i2c_close (i2cDevice) ;
+#endif
 }
-
 
 
 static uint16_t read (uint8_t _7BitAddress, uint8_t registerAddress)
 {
+    bool fault = false ;
+
     union {
         uint16_t  asWord ;
         uint8_t   asBytes [2] ;
@@ -149,18 +153,18 @@ static uint16_t read (uint8_t _7BitAddress, uint8_t registerAddress)
 
     i2c_open (i2cDevice) ;
 
+    I2CAddressNumBits numAddrBits = 7 ;
     bool write = true ;
+    bool stop  = true ;
 
-    i2c_sendStart (i2cDevice, _7BitAddress, write) ;
-    i2c_writeByte (i2cDevice, registerAddress) ;
+    fault |= ! i2c_txStart (i2cDevice, numAddrBits, _7BitAddress, write) ||
+             ! i2c_write   (i2cDevice, & registerAddress, sizeof (registerAddress), ! stop) ;
 
-    i2c_sendStart (i2cDevice, _7BitAddress, ! write) ;
+    uint8_t * dataPtr    =         data.asBytes  ;
+    uint8_t   dataLength = sizeof (data.asBytes) ;
 
-    bool withAck = true ;
-    i2c_readByte (i2cDevice, & data.asBytes [0],   withAck) ;
-    i2c_readByte (i2cDevice, & data.asBytes [1], ! withAck) ;
-
-    i2c_sendStop (i2cDevice) ;
+    fault |= ! i2c_txStart (i2cDevice, numAddrBits, _7BitAddress, ! write) ||
+             ! i2c_read    (i2cDevice, dataPtr, dataLength, stop) ;
 
     i2c_close (i2cDevice) ;
 
@@ -314,29 +318,23 @@ void ioExpander_setBit (IOExpander expanderIndex, uint8_t bitNumber, uint8_t val
     if (expanderIndex >= NumberOfIOExpanders)
         return ;
 
+    if (bitNumber > 15)
+        return ;
+
     Expander *           expanderPtr = & expander [expanderIndex] ;
     uint8_t i2cAddress = expanderPtr -> i2cAddress ;
 
-    union {
-        ExpanderBits_U2   u2Bits ;
-        ExpanderBits_U22 u22Bits ;
-        uint16_t          asWord ;
-    } data ;
-
-    // get the local copy
-    data.asWord = expanderPtr->outputCopy ;
+    uint16_t data = expanderPtr->outputCopy ;   // get the local copy
 
     // modify the local copy
-    data.asWord &= ((        1) << bitNumber) ;
-    data.asWord |= ((value & 1) << bitNumber) ;
+    uint16_t mask = (1 << bitNumber) ;
+    if (value)  data |=   mask ;
+    else        data &= ~ mask ;
 
     // update local copy
-    if (expanderIndex == Index_U2)
-        expanderPtr->outputCopy = data.asWord ;
-    else
-        expanderPtr->outputCopy = data.asWord ;
+    expanderPtr->outputCopy = data ;
 
-    write (i2cAddress, RegisterAddress_outputPort, data.asWord) ;
+    write (i2cAddress, RegisterAddress_outputPort, data) ;
 }
 
 

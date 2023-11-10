@@ -36,6 +36,13 @@ int main (void)
 
     Lua_initialize () ;
 
+    while (1)
+    {
+        uint8_t led_RED  = 13 ;
+        ioExpander_setBit (IOExpander_U22, led_RED, 1) ;    time_delayMilliseconds ( 25) ;
+        ioExpander_setBit (IOExpander_U22, led_RED, 0) ;    time_delayMilliseconds (475) ;
+    }
+
     thread_sleep () ;
 
     return 0 ;

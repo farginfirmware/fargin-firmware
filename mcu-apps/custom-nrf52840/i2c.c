@@ -43,68 +43,58 @@ void i2c_close (I2CDevice device)
 
 
 
-bool i2c_sendStart (I2CDevice device, uint8_t _7bitAddress, bool write_readNot)
+bool i2c_txStart (I2CDevice device, I2CAddressNumBits numAddressBits, uint16_t address, bool write)
 {
     bool fault = (device != 0) ;
-
-    uint8_t startByte = (_7bitAddress << 1) | (write_readNot ? 0 : 1) ;
 
     uint8_t flags = I2C_NOSTOP ;
 
-    uint8_t * dataPtr    = NULL ;
-    uint8_t   dataLength = 0 ;
+    switch (numAddressBits)
+    {
+        default :   return false ;
+        case  7 :   break ;
+        case 10 :   flags |= I2C_ADDR10 ;   break ;
+    }
 
-    fault |= ! (0 == i2c_write_bytes (device, startByte, dataPtr, dataLength, flags)) ;
-
-    return ! fault ;
-}
-
-
-bool i2c_sendStop (I2CDevice device)
-{
-    bool fault = (device != 0) ;
-
-    uint8_t flags   = I2C_NOSTART ;
-    uint8_t address = 0 ;   // this is n/a
+    address = (address << 1) | (write ? 0 : 1) ;
 
     uint8_t * dataPtr    = NULL ;
     uint8_t   dataLength = 0 ;
 
+    // write the start sequence and the address ... no stop sequence
     fault |= ! (0 == i2c_write_bytes (device, address, dataPtr, dataLength, flags)) ;
 
     return ! fault ;
 }
 
 
-bool i2c_writeByte (I2CDevice device, uint8_t aByte)
+
+bool i2c_write (I2CDevice device, uint8_t * dataPtr, uint8_t dataLength, bool stop)
 {
     bool fault = (device != 0) ;
 
-    uint8_t flags   = I2C_NOSTART | I2C_NOSTOP ;
+    uint8_t flags   = I2C_NOSTART ;     // ignore address field
+    uint8_t address = 0 ;
 
-    uint8_t address = 0 ;   // this is n/a
-
-    uint8_t *  dataPtr    = & aByte ;
-    uint8_t    dataLength = sizeof (aByte) ;
-
-    fault |= ! (0 == i2c_write_bytes (device, address, dataPtr, dataLength, flags)) ;
-
-    return ! fault ;
-}
-
-
-bool i2c_readByte (I2CDevice device, uint8_t * bytePtr, bool withAck)
-{
-    bool fault = (device != 0) ;
-
-    uint8_t flags = I2C_NOSTART ;
-    if (withAck)
+    if (! stop)
         flags |= I2C_NOSTOP ;
 
-    uint8_t address = 0 ;   // this is n/a
+    fault |= ! (0 == i2c_write_bytes (device, address, dataPtr, dataLength, flags)) ;
 
-    uint8_t *  dataPtr    = bytePtr ;
-    uint8_t    dataLength = sizeof (* bytePtr) ;
+    return ! fault ;
+}
+
+
+
+bool i2c_read (I2CDevice device, uint8_t * dataPtr, uint8_t dataLength, bool stop)
+{
+    bool fault = (device != 0) ;
+
+    uint8_t flags   = I2C_NOSTART ;     // ignore address field
+    uint8_t address = 0 ;
+
+    if (! stop)
+        flags |= I2C_NOSTOP ;
 
     fault |= ! (0 == i2c_read_bytes (device, address, dataPtr, dataLength, flags)) ;
 
@@ -131,8 +121,8 @@ bool i2c_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 
 void i2c_initialize (void)
 {
-    I2CDevice device = 0 ;
-    i2c_init (device) ;         // this is done by the boot process??
+//  I2CDevice device = 0 ;
+//  i2c_init (device) ;         // is this done by the boot process??
 
     // tbd
 

@@ -5,14 +5,19 @@
 
 #include "service-buffer.h"
 
-typedef uint8_t I2CDevice ;
 
-void i2c_open      (I2CDevice) ;
-void i2c_close     (I2CDevice) ;
-bool i2c_sendStart (I2CDevice, uint8_t _7bitAddress, bool write_readNot) ;
-bool i2c_sendStop  (I2CDevice) ;
-bool i2c_writeByte (I2CDevice, uint8_t) ;
-bool i2c_readByte  (I2CDevice, uint8_t *, bool withAck) ;
+typedef uint8_t I2CDevice ;
+typedef uint8_t I2CAddressNumBits ;
+
+
+void i2c_open    (I2CDevice) ;
+void i2c_close   (I2CDevice) ;
+
+bool i2c_txStart (I2CDevice, I2CAddressNumBits, uint16_t address,   bool write) ;
+
+bool i2c_write   (I2CDevice, uint8_t * dataPtr, uint8_t dataLength, bool stop) ;
+bool i2c_read    (I2CDevice, uint8_t * dataPtr, uint8_t dataLength, bool stop) ;
+
 
 bool i2c_processRequest (ServiceBuffer * request, ServiceBuffer * response) ;
 
