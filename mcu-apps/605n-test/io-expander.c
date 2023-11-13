@@ -1,8 +1,7 @@
 
 #include "io-expander.h"
 
-#include "i2c.h"
-#include "periph/i2c.h"
+#include "i2c.h"    // _I2C_H_
 
 /*
     This code is for the PCAL6416AH io expanders on the rev 2021-02-02 base board
@@ -111,60 +110,43 @@ typedef struct {
 
 static void write (uint8_t _7BitAddress, uint8_t registerAddress, uint16_t bits)
 {
-//  bool fault = false ;
-
     uint8_t i2cTxfr [3] ;
     i2cTxfr [0] = registerAddress ;
-
     i2cTxfr [1] = bits  & 0xff ;
     i2cTxfr [2] = bits >>    8 ;
-/// * ((uint16_t *) & i2cTxfr [1]) = bits ;         tbd order of above
 
-#if 1
-    i2c_acquire (i2cDevice) ;
-    uint8_t flags = 0 ;
-    i2c_write_bytes (i2cDevice, _7BitAddress, i2cTxfr, sizeof (i2cTxfr), flags) ;
-    i2c_release (i2cDevice) ;
-#else
     i2c_open (i2cDevice) ;
 
-    I2CAddressNumBits numAddrBits = 7 ;
-    bool write = true ;
-    bool stop  = true ;
+    I2CAddressNumBits addressBits = 7 ;
+    bool stop = true ;
 
-    fault |= ! i2c_txStart (i2cDevice, numAddrBits, _7BitAddress, write) ;
-    fault |= ! i2c_write   (i2cDevice, i2cTxfr, ArrayLength (i2cTxfr), stop) ;
+    i2c_startThenWrite (i2cDevice, addressBits, _7BitAddress, i2cTxfr, sizeof (i2cTxfr), stop) ;
 
     i2c_close (i2cDevice) ;
-#endif
 }
 
 
 static uint16_t read (uint8_t _7BitAddress, uint8_t registerAddress)
 {
-    bool fault = false ;
-
     union {
         uint16_t  asWord ;
         uint8_t   asBytes [2] ;
     } data ;
 
-    // use low-level API, because there needs to be a write followed by 2 reads
 
     i2c_open (i2cDevice) ;
 
-    I2CAddressNumBits numAddrBits = 7 ;
-    bool write = true ;
-    bool stop  = true ;
-
-    fault |= ! i2c_txStart (i2cDevice, numAddrBits, _7BitAddress, write) ||
-             ! i2c_write   (i2cDevice, & registerAddress, sizeof (registerAddress), ! stop) ;
+    I2CAddressNumBits addressBits = 7 ;
+    bool stop = false ;
+#if 1
+         stop = true ;
+#endif
+    i2c_startThenWrite (i2cDevice, addressBits, _7BitAddress, & registerAddress, sizeof (registerAddress), stop) ;
 
     uint8_t * dataPtr    =         data.asBytes  ;
     uint8_t   dataLength = sizeof (data.asBytes) ;
-
-    fault |= ! i2c_txStart (i2cDevice, numAddrBits, _7BitAddress, ! write) ||
-             ! i2c_read    (i2cDevice, dataPtr, dataLength, stop) ;
+    stop = true ;
+    i2c_startThenRead (i2cDevice, addressBits, _7BitAddress, dataPtr, dataLength, stop) ;
 
     i2c_close (i2cDevice) ;
 
@@ -301,6 +283,9 @@ static void init_InputsOutputs_U22 (void)
 uint8_t ioExpander_getBit (IOExpander expanderIndex, uint8_t bitNumber)
 {
     if (expanderIndex >= NumberOfIOExpanders)
+        return 0 ;
+
+    if (bitNumber > 15)
         return 0 ;
 
     Expander *           expanderPtr = & expander [expanderIndex] ;

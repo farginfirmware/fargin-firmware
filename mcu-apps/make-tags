@@ -1,7 +1,9 @@
 
 ctags   *.h    *.c                                          \
-        ../../modules/fargin_framework/include/*.h          \
-        ../../modules/fargin_framework/*.c                  \
+        ../../modules/fargin_essentials/include/*.h         \
+        ../../modules/fargin_essentials/*.c                 \
+        ../../modules/RTOS_adapter/include/*.h              \
+        ../../modules/RTOS_adapter/*.c                      \
         ../../modules/app_independent_utils/include/*.h     \
         ../../modules/app_independent_utils/*.c             \
                                                             \

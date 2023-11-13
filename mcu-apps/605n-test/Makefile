@@ -1,10 +1,10 @@
 
-APPLICATION = custom-nrf52840
+APPLICATION = 605n-test
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
-BOARD ?= custom-nrf52840
+BOARD ?= 605-nrf52840
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of
@@ -16,7 +16,8 @@ USEMODULE += periph_uart
 USEMODULE += periph_i2c
 
 #FarginFirmware modules
-USEMODULE += fargin_framework
+USEMODULE += fargin_essentials
+USEMODULE += RTOS_adapter
 USEMODULE += app_independent_utils
 
 USEPKG += lua
