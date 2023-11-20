@@ -13,8 +13,8 @@ endif
 USEMODULE += periph_uart
 
 #FarginFirmware modules
-USEMODULE += fargin_framework
-USEMODULE += app_independent_utils
+USEMODULE += fargin-essentials
+USEMODULE += app-independent-utils
 
 USEPKG += lua
 

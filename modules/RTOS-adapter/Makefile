@@ -1,5 +1,5 @@
 
-MODULE := fargin_essentials
+MODULE := RTOS-adapter
 
 include $(RIOTBASE)/Makefile.base
 

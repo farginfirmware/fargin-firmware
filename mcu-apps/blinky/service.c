@@ -13,7 +13,6 @@ static RequestProcessingFunction nextLevelProcessor [] = {
 
     /* 0 */     LED0_processRequest,
     /* 1 */     time_processRequest,
-
 } ;
 
 

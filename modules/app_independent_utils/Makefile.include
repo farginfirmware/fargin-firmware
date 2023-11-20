@@ -1,4 +1,0 @@
-
-USEMODULE_INCLUDES_app_independent_utils := $(LAST_MAKEFILEDIR)/include
-USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_app_independent_utils)
-

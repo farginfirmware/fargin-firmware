@@ -53,7 +53,6 @@ int main (void)
 
     while (1)
     {
-      #if 1
         IOExpander caseOpenExpander = IOExpander_U22 ;
         uint8_t caseOpenInput = 6 ;
         while (0 == ioExpander_getBit (caseOpenExpander, caseOpenInput))
@@ -61,10 +60,15 @@ int main (void)
             ioExpander_setBit (ledsExpander, led_RED, 1) ;  time_delayMilliseconds (500) ;
             ioExpander_setBit (ledsExpander, led_RED, 0) ;  time_delayMilliseconds (500) ;
         }
-      #endif
 
-        ioExpander_setBit (ledsExpander, led_GREEN, 1) ;    time_delayMilliseconds ( 25) ;
-        ioExpander_setBit (ledsExpander, led_GREEN, 0) ;    time_delayMilliseconds (475) ;
+        bool blue ;
+        blue = ioExpander_getBit (ledsExpander, led_BLUE) ;
+        ioExpander_setBit (ledsExpander, led_BLUE, ! blue) ;    time_delayMilliseconds ( 25) ;
+        blue = ioExpander_getBit (ledsExpander, led_BLUE) ;
+        ioExpander_setBit (ledsExpander, led_BLUE, ! blue) ;    time_delayMilliseconds (475) ;
+
+//      ioExpander_setBit (ledsExpander, led_GREEN, 1) ;    time_delayMilliseconds ( 25) ;
+//      ioExpander_setBit (ledsExpander, led_GREEN, 0) ;    time_delayMilliseconds (475) ;
     }
 
     thread_sleep () ;

@@ -1,11 +1,11 @@
 
 ctags   *.h    *.c                                          \
-        ../../modules/fargin_essentials/include/*.h         \
-        ../../modules/fargin_essentials/*.c                 \
-        ../../modules/RTOS_adapter/include/*.h              \
-        ../../modules/RTOS_adapter/*.c                      \
-        ../../modules/app_independent_utils/include/*.h     \
-        ../../modules/app_independent_utils/*.c             \
+        ../../modules/fargin-essentials/include/*.h         \
+        ../../modules/fargin-essentials/*.c                 \
+        ../../modules/RTOS-adapter/include/*.h              \
+        ../../modules/RTOS-adapter/*.c                      \
+        ../../modules/app-independent-utils/include/*.h     \
+        ../../modules/app-independent-utils/*.c             \
                                                             \
         ~/Projects/RIOT/drivers/include/periph/*.h          \
 

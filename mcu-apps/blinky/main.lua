@@ -1,5 +1,5 @@
 
--- services (service_request() is defined in Lua.c)
+-- services tightly coupled to nextLevelProcessor[] in service.c
 local led0 = 0
 local time = 1
 
@@ -9,7 +9,7 @@ local   on = 1
 
 
 local function led0_set (state)
-    service_request (led0, state)
+    service_request (led0, state)   -- service_request() is defined in Lua.c
 end
 
 local function delayMilliseconds (milliseconds)

@@ -1,5 +1,5 @@
 
-MODULE := app_independent_utils
+MODULE := fargin-essentials
 
 include $(RIOTBASE)/Makefile.base
 

@@ -1,6 +1,10 @@
 
 service-via-serial
 
+
+[this is a work in progress]
+
+
 With this app, a **major** feature of the FarginFirmware framework is
 in place - namely the ability to invoke native mcu services via a serial
 interface.
