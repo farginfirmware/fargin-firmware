@@ -4,18 +4,17 @@
 #include "service-buffer.h"
 
 
-#include "gpio.h"
-#include "test.h"
+#include "LED0.h"
+#include "BTN0.h"
 #include "time.h"
 
 static RequestProcessingFunction nextLevelProcessor [] = {
 
     // NOTE!! these are tightly coupled to variables in main.lua
 
-    /* 0 */     test_processRequest,
-    /* 1 */     time_processRequest,
-    /* 2 */     gpio_processRequest,
-
+    /* 0 */     time_processRequest,
+    /* 1 */     LED0_processRequest,
+    /* 2 */     BTN0_processRequest,
 } ;
 
 

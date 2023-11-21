@@ -3,7 +3,6 @@
 
 #include <errno.h>
 #include <math.h>
-#include <thread.h>
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -15,10 +14,6 @@
 #include "service-buffer.h"
 #include "service.h"
 #include "time.h"
-
-
-#define LUA_MEM_SIZE  (30000)       // TBD
-static char lua_mem [LUA_MEM_SIZE] __attribute__  ((aligned (__BIGGEST_ALIGNMENT__))) ;
 
 
 static uint8_t  requestBuffer [100] ;   // tbd size
@@ -182,10 +177,12 @@ static void C_from_Lua_initialize (lua_State * L)
 
 
 
-static void * lua_thread (void * arg)
-{
-    (void) arg ;
+#define LUA_MEM_SIZE  (20000)       // TBD ... 10000 does not work!
+static char lua_mem [LUA_MEM_SIZE] __attribute__  ((aligned (__BIGGEST_ALIGNMENT__))) ;
 
+
+void Lua_run (void)
+{
     serviceBuffer_initialize (&  request,  requestBuffer, sizeof ( requestBuffer)) ;
     serviceBuffer_initialize (& response, responseBuffer, sizeof (responseBuffer)) ;
 
@@ -203,22 +200,14 @@ static void * lua_thread (void * arg)
             LED0_OFF ;  time_delayMilliseconds (1000) ;
         }
 
-        return NULL ;
+        return ;
     }
 
 
-    lua_riot_openlibs (L,
-                    // LUAR_LOAD_ALL     |
-                       LUAR_LOAD_CORO    |      // coroutines
-                    // LUAR_LOAD_DEBUG   |
-                    // LUAR_LOAD_IO      |
-                       LUAR_LOAD_MATH    |
-                    // LUAR_LOAD_OS      |
-                    // LUAR_LOAD_PACKAGE |
-                       LUAR_LOAD_STRING  |
-                       LUAR_LOAD_TABLE   |
-                    // LUAR_LOAD_UTF8    |
-                       LUAR_LOAD_BASE    ) ;
+    lua_riot_openlibs (L,  LUAR_LOAD_MATH   |
+                           LUAR_LOAD_STRING |
+//                         LUAR_LOAD_TABLE  |
+                           LUAR_LOAD_BASE   ) ;
 
 
     C_from_Lua_initialize (L) ;
@@ -237,7 +226,7 @@ static void * lua_thread (void * arg)
             LED0_OFF ;  time_delayMilliseconds (500) ;
         }
 
-        return NULL ;
+        return ;
     }
 
     lua_close (L) ;
@@ -250,22 +239,5 @@ static void * lua_thread (void * arg)
         LED0_OFF ;  time_delayMilliseconds (250) ;
     }
 
-    return NULL ;
-}
-
-
-int Lua_initialize (void)
-{
-    static char         stack [4096] ;                          // TBD
-    uint8_t             priority =  THREAD_PRIORITY_IDLE - 1 ;  // lowest possible priority
-    int                 flags    =  THREAD_CREATE_STACKTEST ;
-    thread_task_func_t  task     =  lua_thread ;
-    void *              arg      =  NULL ;
-    const char *        name     = "Lua" ;
-
-    kernel_pid_t pid =
-        thread_create (stack, sizeof (stack), priority, flags, task, arg, name) ;
-
-    return pid_is_valid (pid) ;
 }
 

@@ -37,13 +37,14 @@ What's so ~~great~~ ~~special~~ different about this firmware?
 
 examples in folder mcu-apps/
 - blinky
+- blinky-with-button
 - blinky-with-more-gpio
 - threads-and-coroutines
-- service-via-serial
-- etc (in progress)
+- service-via-serial (in progress)
+- etc (tbd)
 
 external references:
-- [RIOT OS 2023.07](https://github.com/RIOT-OS/RIOT/tree/2023.07-branch) which includes
+- [RIOT OS 2023.10](https://github.com/RIOT-OS/RIOT/tree/2023.10-branch) which includes
 - a [Lua 5.3](https://www.lua.org/versions.html#5.3) package
 
 

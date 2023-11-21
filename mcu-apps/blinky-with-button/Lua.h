@@ -3,6 +3,6 @@
 
 #include "project.h"
 
-int Lua_initialize (void) ;
+void Lua_run (void) ;
 
 #endif
