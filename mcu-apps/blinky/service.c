@@ -11,8 +11,8 @@ static RequestProcessingFunction nextLevelProcessor [] = {
 
     // NOTE!! these are tightly coupled to variables in main.lua
 
-    /* 0 */     LED0_processRequest,
-    /* 1 */     time_processRequest,
+    /* 0 */     time_processRequest,
+    /* 1 */     LED0_processRequest,
 } ;
 
 

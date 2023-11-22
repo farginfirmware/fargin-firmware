@@ -7,7 +7,7 @@
 #include <string.h>
 
 
-// these constants are tightly coupled to Lua variables
+// these constants are tightly coupled to variables in main.lua
 
     #define Service_getHandle   0
     #define Service_configure   1

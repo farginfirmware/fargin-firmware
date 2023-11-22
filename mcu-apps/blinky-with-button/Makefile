@@ -1,7 +1,6 @@
 
 APPLICATION = blinky-with-button
 
-EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
 BOARD ?= makerdiary-nrf52840-m2-kit

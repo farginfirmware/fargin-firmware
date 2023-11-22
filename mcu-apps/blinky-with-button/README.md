@@ -6,16 +6,16 @@ Some small MCUs might not have enough CODE or DATA space to work
 ([Lua](http://lua.org) takes a lot of both).
 
 This is a baby step which builds upon the "blinky" app.  It shows how results
-(button pressed in this case) are returned from native MCU code to Lua.
+(button pressed in this case) are returned from native mcu code to Lua.
 
-native MCU firmware
- - single-threaded (Lua interpreter)
+native mcu code
+ - single-threaded (the Lua interpreter is the only thread)
 
 interpreted Lua app
- - single-threaded (i.e. no co-routines yet)
+ - single-threaded (i.e. no co-routines)
  - "LED0" is directly accessible
  - "BTN0" is directly accessible
 
-test platform
+development platform
  - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
 

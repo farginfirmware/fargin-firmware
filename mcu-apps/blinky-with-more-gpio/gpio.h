@@ -9,6 +9,5 @@
 bool gpio_processRequest (ServiceBuffer * request, ServiceBuffer * response) ;
 
 
-
 #endif
 

@@ -4,7 +4,7 @@ APPLICATION = 605n-test
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
-BOARD ?= 605-nrf52840
+BOARD ?= 605-nrf52840   # custom board
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of

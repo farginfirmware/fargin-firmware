@@ -2,8 +2,8 @@
 -- services available to Lua (see service_request() in Lua.c)
 local service = {
     -- these defs are tightly coupled to nextLevelProcessor[] in service.c
-    led0 = 0,
-    time = 1,
+    time = 0,
+    led0 = 1,
     gpio = 2
 }
 

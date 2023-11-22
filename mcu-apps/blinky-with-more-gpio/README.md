@@ -21,21 +21,20 @@ result, button = service_request (service.gpio, gpio.getHandle, port, bit)
 
 Notice that the first call to service_request() above saves the values returned
 by the service request.
- - "result" indicates whether or not the call succeeded
+ - "result" indicates whether or not the service request succeeded
  - "button" is the handle for subsequent button functions provided the call succeeded
 
 (I so appreciate functions which return multiple values!)
 
 
-
-native MCU firmware
+native mcu firmware
  - single-threaded (Lua interpreter)
- - service request and response buffers
 
 interpreted Lua app
- - single-threaded (i.e. no co-routines yet)
+ - single-threaded (i.e. no co-routines)
  - "LED0" is directly accessible
 
-test platform
+
+development platform
  - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
 
