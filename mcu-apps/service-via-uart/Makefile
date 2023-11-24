@@ -1,5 +1,5 @@
 
-APPLICATION = service-via-serial
+APPLICATION = service-via-uart
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
