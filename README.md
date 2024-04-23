@@ -43,6 +43,6 @@ examples in folder mcu-apps/
 - etc (tbd ... in progress)
 
 external references:
-- [RIOT OS 2023.10](https://github.com/RIOT-OS/RIOT/tree/2023.10-branch) which includes
+- [RIOT OS 2024.01](https://github.com/RIOT-OS/RIOT/tree/2024.01-branch) which includes
 - a [Lua 5.3](https://www.lua.org/versions.html#5.3) package
 

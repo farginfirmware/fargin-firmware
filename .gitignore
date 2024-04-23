@@ -1,3 +1,7 @@
 
 tags
 
+# bin (e.g.:build directory) and .bin files
+bin
+*.bin
+

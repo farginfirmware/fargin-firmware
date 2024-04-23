@@ -50,7 +50,10 @@ USEMODULE += vfs_auto_format                        ### commenting out lets the 
 ## CFLAGS += -DCONFIG_NIMBLE_AUTOADV_DEVICE_NAME='"LCU device"'
 
 
-USEMODULE += service_buffers
+#FarginFirmware modules
+USEMODULE += fargin-essentials
+USEMODULE += RTOS-adapter
+USEMODULE += app-independent-utils
 
 USEPKG += lua
 USEPKG += littlefs2

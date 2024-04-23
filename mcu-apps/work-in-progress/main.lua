@@ -1,4 +1,5 @@
 
+-- NOTE!! these are tightly coupled to requestServers[] in main.c
 local test = 0
 local time = 1
 local gpio = 2
