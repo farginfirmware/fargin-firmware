@@ -1,5 +1,5 @@
 
-APPLICATION = blinky
+APPLICATION = sandbox
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
