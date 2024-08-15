@@ -1,4 +1,6 @@
 
+tbd
+
 This "blinky" app is intended to run on any
 [RIOT OS defined board](https://github.com/RIOT-OS/RIOT/tree/master/boards)
 which includes LED0.  (Most boards have at least LED0.) Some small MCUs might
@@ -12,13 +14,12 @@ minimally a result indication and may contain response data. In this example,
 Lua sends requests for LED0 and time services, but does not yet do anything
 with service responses.
 
-native mcu code
- - single-threaded (the Lua interpreter is the only thread)
+For small microcontrollers with less CODE and DATA space, the amount of memory
+for Lua may need to be reduced. See
+ - LUA_STACK_SIZE
+ - LUA_MEM_SIZE
+in modules/fargin-essentials/Lua.c
 
-interpreted Lua app
- - single-threaded (i.e. no co-routines)
- - "LED0" is directly accessible
-
-development platform
+The platform used to develop this app was:
  - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
 

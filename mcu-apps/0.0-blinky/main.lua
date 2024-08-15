@@ -1,5 +1,5 @@
 
--- services tightly coupled to nextLevelProcessor[] in service.c
+-- services tightly coupled to requestServers[] in main.c
 local time = 0
 local led0 = 1
 
@@ -23,8 +23,8 @@ local function main()
     local milliseconds_OFF = 1900
 
     while true do
-        led0_set (on)   delayMilliseconds (milliseconds_ON)
-        led0_set (off)  delayMilliseconds (milliseconds_OFF)
+        led0_set (on)       delayMilliseconds (milliseconds_ON)
+        led0_set (off)      delayMilliseconds (milliseconds_OFF)
     end
 
 end

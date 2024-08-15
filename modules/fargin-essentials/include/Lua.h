@@ -3,6 +3,6 @@
 
 #include "project.h"
 
-int Lua_initialize (void) ;
+int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes) ;
 
 #endif

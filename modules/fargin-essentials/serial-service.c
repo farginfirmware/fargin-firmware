@@ -22,10 +22,10 @@
             tx command from request buffer
             rx response and write to response buffer
 
-        so, 2 functions
+    so, a function for each mode
 
-            convert a serial rx stream to a service buffer
-            convert a service buffer to a serial tx stream
+        convert  a serial rx stream  to  a service buffer
+        convert  a service buffer    to  a serial tx stream
 
 
     multiple interfaces
@@ -470,7 +470,7 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr)
 
         switch (token.type)
         {
-            default                       : fault = true ;  break ;
+            default                       : fault = true ;                                break ;
 
             case ServiceBuffer_End        : tx_Checksum   (& txfr) ;                      break ;
 

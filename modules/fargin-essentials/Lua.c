@@ -2,6 +2,7 @@
 #include "Lua.h"
 
 #include <errno.h>
+#include <malloc.h>
 #include <math.h>
 #include <thread.h>
 
@@ -12,13 +13,30 @@
 #include "blob/main.lua.h"  // Lua startup code
 
 #include "board.h"
+#include "ff.time.h"
 #include "service-buffer.h"
 #include "service.h"
-#include "time.h"
 
 
-#define LUA_MEM_SIZE  (30000)       // TBD
-static char lua_mem [LUA_MEM_SIZE] __attribute__  ((aligned (__BIGGEST_ALIGNMENT__))) ;
+static void fatal_error (uint8_t blips)
+{
+    // provide visual error indication ;
+    // there is no return from this function
+
+    while (1)
+    {
+      #ifdef LED0_PIN
+        uint8_t count = blips ;
+        while (count --)
+        {
+            LED0_ON  ;  time_delayMilliseconds ( 25) ;
+            LED0_OFF ;  time_delayMilliseconds (475) ;
+        }
+      #endif
+
+        time_delayMilliseconds (1000) ;
+    }
+}
 
 
 static uint8_t  requestBuffer [100] ;   // tbd size
@@ -72,7 +90,7 @@ static bool getArg (lua_State * L, uint8_t argIndex)
             //    function returns the correct length of the string. In
             //    particular, assuming that the value at the top of the stack
             //    is a string, the following assertions are always valid:
-            //    
+            //
             //        const char * s = lua_tostring (L, argIndex) ;     // any Lua string
             //        size_t       l = lua_strlen   (L, argIndex) ;     // its length
             //        assert (s [l] == '\0') ;
@@ -182,29 +200,23 @@ static void C_from_Lua_initialize (lua_State * L)
 
 
 
-static void * lua_thread (void * arg)
+static void * lua_thread (void * luaMemSizeArg)
 {
-    (void) arg ;
-
     serviceBuffer_initialize (&  request,  requestBuffer, sizeof ( requestBuffer)) ;
     serviceBuffer_initialize (& response, responseBuffer, sizeof (responseBuffer)) ;
 
 
-    lua_State * L = lua_riot_newstate (lua_mem, sizeof (lua_mem), NULL) ;
+    uint32_t luaMemSize = (uint32_t) luaMemSizeArg ;
+
+    char * lua_mem = malloc (luaMemSize) ;
+    if (lua_mem == NULL)
+        fatal_error (3) ;
+
+    lua_State * L = lua_riot_newstate (lua_mem, luaMemSize, NULL) ;
 
     if  (L == NULL)
-    {
         // cannot create state: not enough memory
-
-        // provide visual error indication
-        while (1)
-        {
-///         LED0_ON  ;  time_delayMilliseconds (1000) ;
-///         LED0_OFF ;  time_delayMilliseconds (1000) ;
-        }
-
-        return NULL ;
-    }
+        fatal_error (4) ;
 
 
     lua_riot_openlibs (L,
@@ -227,44 +239,34 @@ static void * lua_thread (void * arg)
     luaL_loadbuffer (L, (const char *) main_lua, main_lua_len, "Lua startup code") ;
 
     if  (lua_pcall (L, 0, 0, 0) != LUA_OK)
-    {
         // Lua script running failed
-
-        // provide visual error indication
-        while (1)
-        {
-///         LED0_ON  ;  time_delayMilliseconds (500) ;
-///         LED0_OFF ;  time_delayMilliseconds (500) ;
-        }
-
-        return NULL ;
-    }
+        fatal_error (5) ;
 
     lua_close (L) ;
 
-
-    // provide visual error indication
-    while (1)
-    {
-///     LED0_ON  ;  time_delayMilliseconds (250) ;
-///     LED0_OFF ;  time_delayMilliseconds (250) ;
-    }
+    // unexpected Lua termination
+    fatal_error (6) ;
 
     return NULL ;
 }
 
 
-int Lua_initialize (void)
+int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes)
 {
-    static char         stack [4096] ;                          // TBD
     uint8_t             priority =  THREAD_PRIORITY_IDLE - 1 ;  // lowest possible priority
     int                 flags    =  THREAD_CREATE_STACKTEST ;
     thread_task_func_t  task     =  lua_thread ;
-    void *              arg      =  NULL ;
+    void *              arg      =  (void *) heapBytes ;
     const char *        name     = "Lua" ;
 
-    kernel_pid_t pid =
-        thread_create (stack, sizeof (stack), priority, flags, task, arg, name) ;
+    char * stack = malloc (stackBytes) ;
+    if (stack == NULL)
+    {
+        fatal_error (2) ;
+        return -1 ;
+    }
+
+    kernel_pid_t pid = thread_create (stack, stackBytes, priority, flags, task, arg, name) ;
 
     return pid_is_valid (pid) ;
 }

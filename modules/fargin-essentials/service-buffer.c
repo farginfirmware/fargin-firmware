@@ -154,7 +154,9 @@ bool serviceBuffer_putBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t
 }
 
 
-#if 0
+
+#if 0   ///
+
 bool serviceBuffer_appendByte (ServiceBuffer * svcBuf, uint8_t aByte)
 {
     // this assumes that serviceBuffer_putBytes() was called immediately prior
@@ -197,6 +199,7 @@ typedef struct {
     return ! fault ;
 }
 #endif
+
 
 
 bool serviceBuffer_putString (ServiceBuffer * svcBuf, char * dataPtr)

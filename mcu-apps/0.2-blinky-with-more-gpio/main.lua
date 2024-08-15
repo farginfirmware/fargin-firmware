@@ -75,8 +75,9 @@ local function main()
             delayMilliseconds (100)
         end
 
-        blueLED_set (0)             -- on
         led0_set (ledState.off)
+
+        blueLED_set (0)             -- on
         delayMilliseconds (milliseconds_OFF)
 
         blueLED_set (1)             -- off
