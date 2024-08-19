@@ -40,7 +40,7 @@ local LED = {
         setmetatable (led, self)
         self.__index = self
 
-        _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
+        _, _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
 
         service_request (service.gpio, gpio.configure, led.handle, gpio.configureArgs.output.pushPull)
 

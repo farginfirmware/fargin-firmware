@@ -24,7 +24,7 @@ local function main()
         delayMilliseconds ( 500)
         count = count + 1
         testString_1 = "\r\n" .. tostring (count) .. " "
-        _, testString_1, testString_2, testString_3 =
+        _, _, testString_1, testString_2, testString_3 =
             service_request (uart, 0, testString_1, testString_2, testString_3)
     end
 end 

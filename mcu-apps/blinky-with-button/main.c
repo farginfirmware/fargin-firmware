@@ -5,23 +5,35 @@
 #include "thread.h"
 
 
-#include "ff.time.h"
-#include "LED0.h"
-#include "BTN0.h"
+    // services available to Lua
 
-static RequestProcessingFunction requestServers [] = {
-    /// NOTE!! these are tightly coupled to definitions in main.lua
-    /* 0 */     time_processRequest,
-    /* 1 */     LED0_processRequest,
-    /* 2 */     BTN0_processRequest,
-} ;
+    #include "ff.time.h"
+    #include "LED0.h"
+    #include "BTN0.h"
+
+    static RequestProcessingFunction requestServers [] = {
+        /// NOTE!! these are tightly coupled to definitions in main.lua
+        /* 0 */     time_processRequest,
+        /* 1 */     LED0_processRequest,
+        /* 2 */     BTN0_processRequest,
+    } ;
 
 
 int main (void)
 {
     service_initialize (requestServers, ArrayLength (requestServers)) ;
 
-    Lua_initialize () ;
+
+    // these may need to be reduced for microcontrollers with less code and data
+    // space running small, simple Lua apps ("blinky" for example)
+    //
+    // increase these for bigger Lua apps on microcontrollers with more code and data space
+    //
+    const uint16_t LuaStackBytes =  4096 ;
+    const uint32_t LuaHeapBytes  = 20000 ;
+
+    Lua_initialize (LuaStackBytes, LuaHeapBytes) ;
+
 
     // in this application, the only thread that needs to run is Lua
     thread_sleep () ;

@@ -6,9 +6,8 @@
 ]]
 
 
--- services available to Lua (see service_request() in Lua.c)
+-- services tightly coupled to requestServers[] in main.c
 local service = {
-    -- these defs are tightly coupled to nextLevelProcessor[] in service.c
     test = 0,   -- not used in this app
     time = 1,
     gpio = 2
@@ -40,7 +39,7 @@ local LED = {
         setmetatable (led, self)
         self.__index = self
 
-        _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
+        _, _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
 
         service_request (service.gpio, gpio.configure, led.handle, gpio.configureArgs.output.pushPull)
 

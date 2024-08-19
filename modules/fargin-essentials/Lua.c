@@ -18,6 +18,9 @@
 #include "service.h"
 
 
+static bool interruptRequest = false ;
+
+
 static void fatal_error (uint8_t blips)
 {
     // provide visual error indication ;
@@ -153,6 +156,11 @@ static int service_request (lua_State * L)
 
 
     fault |= ! service_processRequest (& request, & response) ;
+
+
+    // push interruptRequest
+    lua_pushboolean (L, interruptRequest ? 0 : 1) ;
+    ++ numberOfResults ;
 
 
     // push the result of the call to service_processRequest()

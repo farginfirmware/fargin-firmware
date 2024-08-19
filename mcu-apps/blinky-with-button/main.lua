@@ -1,5 +1,5 @@
 
--- services tightly coupled to nextLevelProcessor[] in service.c
+-- services tightly coupled to requestServers[] in main.c
 local time = 0
 local led0 = 1
 local btn0 = 2
@@ -18,9 +18,10 @@ local function led0_set (state)
 end
 
 local function buttonPressed()
+    local interruptRequest
     local serviceRequestResult
     local buttonState
-    serviceRequestResult, buttonState = service_request (btn0)
+    interruptRequest, serviceRequestResult, buttonState = service_request (btn0)
     return buttonState == 0
 end
 

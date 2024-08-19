@@ -1,5 +1,5 @@
 
--- NOTE!! these are tightly coupled to requestServers[] in main.c
+-- services tightly coupled to requestServers[] in main.c
 local test = 0
 local time = 1
 local gpio = 2
@@ -58,11 +58,11 @@ local function main()
     local greenPeriod, greenDuty
     local   redPeriod,   redDuty
 
-    _, greenPeriod = service_request (test, 0)
-    _, greenDuty   = service_request (test, 1)
+    _, _, greenPeriod = service_request (test, 0)
+    _, _, greenDuty   = service_request (test, 1)
 
-    _,   redPeriod = service_request (test, 2)
-    _,   redDuty   = service_request (test, 3)
+    _, _,   redPeriod = service_request (test, 2)
+    _, _,   redDuty   = service_request (test, 3)
 
     coroutine.resume (blink_GREEN, green_LED, greenPeriod, greenDuty)
     coroutine.resume (blink_RED,     red_LED,   redPeriod,   redDuty)
@@ -75,7 +75,7 @@ local function main()
         coroutine.resume (blink_GREEN)
         coroutine.resume (blink_RED)
 
-        _, testString_1, testString_2, testString_3 =
+        _, _, testString_1, testString_2, testString_3 =
             service_request (uart, 0, testString_1, testString_2, testString_3)
     end
 end 

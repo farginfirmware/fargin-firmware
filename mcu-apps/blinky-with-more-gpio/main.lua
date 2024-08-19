@@ -1,7 +1,6 @@
 
--- services available to Lua (see service_request() in Lua.c)
+-- services tightly coupled to requestServers[] in main.c
 local service = {
-    -- these defs are tightly coupled to nextLevelProcessor[] in service.c
     time = 0,
     led0 = 1,
     gpio = 2
@@ -33,7 +32,7 @@ end
 
 local function buttonPressed()
     local buttonState
-    _, buttonState = service_request (service.gpio, gpio.read, button)
+    _, _, buttonState = service_request (service.gpio, gpio.read, button)
     return buttonState == 0
 end
 
@@ -48,18 +47,18 @@ end
 
 local function main()
 
+    local interruptRequest
     local port, bit
-    local result
 
     port =  0
     bit  = 31
-    result, blueLED = service_request (service.gpio, gpio.getHandle, port, bit)
-                      service_request (service.gpio, gpio.configure, blueLED, gpio.configureArgs.output.pushPull)
+    _, _, blueLED = service_request (service.gpio, gpio.getHandle, port, bit)
+                    service_request (service.gpio, gpio.configure, blueLED, gpio.configureArgs.output.pushPull)
 
     port =  0
     bit  = 19
-    result, button = service_request (service.gpio, gpio.getHandle, port, bit)
-                     service_request (service.gpio, gpio.configure, button, gpio.configureArgs.input.pullUp)
+    _, _, button = service_request (service.gpio, gpio.getHandle, port, bit)
+                   service_request (service.gpio, gpio.configure, button, gpio.configureArgs.input.pullUp)
 
 
     local milliseconds_ON  =  100
