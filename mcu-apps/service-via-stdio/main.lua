@@ -18,10 +18,9 @@ local function led0_set (state)
 end
 
 local function buttonPressed()
-    local interruptRequest
     local serviceRequestResult
     local buttonState
-    interruptRequest, serviceRequestResult, buttonState = service_request (btn0)
+    serviceRequestResult, buttonState = service_request (btn0)
     return buttonState == 0
 end
 
@@ -34,9 +33,11 @@ local function main()
     while true do
 
         if buttonPressed() then
-            milliseconds_ON  =  50
-            milliseconds_OFF = 100
+            -- 5 Hz blink
+            milliseconds_ON  =  25
+            milliseconds_OFF = 175
         else
+            -- 1 Hz blink
             milliseconds_ON  = 100
             milliseconds_OFF = 900
         end

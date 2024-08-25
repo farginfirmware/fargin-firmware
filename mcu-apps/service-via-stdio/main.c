@@ -1,11 +1,14 @@
 
 #include "Lua.h"
 #include "service.h"
+#include "service-via-stdio.h"
 
 #include "thread.h"
 
 
-    // services available to Lua
+    // services available to:
+    //   Lua
+    //   serviceViaStdio
 
     #include "ff.time.h"
     #include "LED0.h"
@@ -23,19 +26,12 @@ int main (void)
 {
     service_initialize (requestServers, ArrayLength (requestServers)) ;
 
-
-    // these may need to be reduced for microcontrollers with less code and data
-    // space running small, simple Lua apps ("blinky" for example)
-    //
-    // increase these for bigger Lua apps on microcontrollers with more code and data space
-    //
     const uint16_t LuaStackBytes =  4096 ;
-    const uint32_t LuaHeapBytes  = 20000 ;
-
+    const uint32_t LuaHeapBytes  = 40000 ;
     Lua_initialize (LuaStackBytes, LuaHeapBytes) ;
 
+    serviceViaStdio_initialize () ;
 
-    // in this application, the only thread that needs to run is Lua
     thread_sleep () ;
 
     return 0 ;

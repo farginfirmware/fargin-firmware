@@ -1,8 +1,6 @@
 
-service-via-uart
+service-via-stdio
 
-
-[this is a work in progress]
 
 
 With this app, a **major** feature of the FarginFirmware framework is
@@ -31,7 +29,7 @@ testing the firmware via serial service can be done with
  - a test program written in any language (including Lua)
 
 
-this app does it via a uart
+this app does it via stdio
 
 
 there is nothing new going on with Lua in this app - this is all about 
@@ -46,18 +44,14 @@ this protocol could also be used without Lua
 
 
 
-not needed
+when serial service is no longer needed:
  - after the native code has been wrung out
  - after the Lua app has been developed
-
-
-This app uses a uart for the serial interface, but it could easily be provided
-via usb or bluetooth (e.g. via shell commands).
-
 
 
 
 
 test platform
- - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
+ - [Adafruit ItsyBitsy M4](https://www.adafruit.com/product/3800)
+
 

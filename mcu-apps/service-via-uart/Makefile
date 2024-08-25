@@ -14,6 +14,7 @@ USEMODULE += periph_uart
 
 #FarginFirmware modules
 USEMODULE += fargin-essentials
+USEMODULE += RTOS-adapter
 USEMODULE += app-independent-utils
 
 USEPKG += lua

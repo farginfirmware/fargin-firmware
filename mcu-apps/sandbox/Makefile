@@ -28,7 +28,6 @@ USEMODULE += stdio_cdc_acm        # can't use this when using stdio_nimble below
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 ##EMODULE += ps
-USEMODULE += ps
 
 USEMODULE += periph_uart
 

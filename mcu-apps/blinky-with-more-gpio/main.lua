@@ -32,7 +32,7 @@ end
 
 local function buttonPressed()
     local buttonState
-    _, _, buttonState = service_request (service.gpio, gpio.read, button)
+    _, buttonState = service_request (service.gpio, gpio.read, button)
     return buttonState == 0
 end
 
@@ -47,18 +47,17 @@ end
 
 local function main()
 
-    local interruptRequest
     local port, bit
 
     port =  0
     bit  = 31
-    _, _, blueLED = service_request (service.gpio, gpio.getHandle, port, bit)
-                    service_request (service.gpio, gpio.configure, blueLED, gpio.configureArgs.output.pushPull)
+    _, blueLED = service_request (service.gpio, gpio.getHandle, port, bit)
+                 service_request (service.gpio, gpio.configure, blueLED, gpio.configureArgs.output.pushPull)
 
     port =  0
     bit  = 19
-    _, _, button = service_request (service.gpio, gpio.getHandle, port, bit)
-                   service_request (service.gpio, gpio.configure, button, gpio.configureArgs.input.pullUp)
+    _, button = service_request (service.gpio, gpio.getHandle, port, bit)
+                service_request (service.gpio, gpio.configure, button, gpio.configureArgs.input.pullUp)
 
 
     local milliseconds_ON  =  100

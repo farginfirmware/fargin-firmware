@@ -1,19 +1,15 @@
-
-APPLICATION = 605n-test
+APPLICATION = service-via-stdio
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
-BOARD ?= 605-nrf52840   # custom board
+BOARD ?= adafruit-itsybitsy-m4
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of
   # various lengths. Other functions untested.
   CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
 endif
-
-USEMODULE += periph_uart
-USEMODULE += periph_i2c
 
 #FarginFirmware modules
 USEMODULE += fargin-essentials
@@ -25,5 +21,15 @@ USEPKG += lua
 # generate .lua.h header files of .lua files
 BLOBS += $(wildcard *.lua)
 
-include $(RIOTBASE)/Makefile.include
+USEMODULE += stdio_cdc_acm  ## ??
+USEMODULE += stdin
+USEMODULE += usbus
+USEMODULE += auto_init_usbus
 
+# USB device vendor and product ID
+USB_VID ?= $(USB_VID_TESTING)
+USB_PID ?= $(USB_PID_TESTING)
+
+
+# this must be the last directive in this file
+include $(RIOTBASE)/Makefile.include

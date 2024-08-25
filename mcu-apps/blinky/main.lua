@@ -19,8 +19,8 @@ end
 
 local function main()
 
-    local milliseconds_ON  =  100
-    local milliseconds_OFF = 1900
+    local milliseconds_ON  =   25
+    local milliseconds_OFF = 1975
 
     while true do
         led0_set (on)       delayMilliseconds (milliseconds_ON)

@@ -18,6 +18,6 @@ typedef char (* RxFunctionPtr) (void) ;
 typedef void (* TxFunctionPtr) (char) ;
 
 bool serialService_receive  (ServiceBuffer *, RxFunctionPtr) ;
-bool serialService_transmit (ServiceBuffer *, TxFunctionPtr) ;
+bool serialService_transmit (ServiceBuffer *, TxFunctionPtr, bool serviceResult) ;
 
 #endif

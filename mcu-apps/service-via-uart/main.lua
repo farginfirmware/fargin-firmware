@@ -1,20 +1,11 @@
 
---[[
-    This file would normally be only Lua startup code.
-    This is not intended to be the whole app (although it certainly could be).
-    But for this and other examples, this is the whole Lua app.
-]]
-
-
--- services available to Lua (see service_request() in Lua.c)
+-- services tightly coupled to requestServers[] in main.c
 local service = {
-    -- these defs are tightly coupled to nextLevelProcessor[] in service.c
-    test = 0,   -- not used in this app
-    time = 1,
-    gpio = 2
+    time = 0,
+    gpio = 1
 }
 
--- gpio args (see gpio.c)
+-- gpio args (see ff.gpio.c)
 local gpio = {
     getHandle = 0,
     configure = 1,
@@ -40,7 +31,7 @@ local LED = {
         setmetatable (led, self)
         self.__index = self
 
-        _, _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
+        _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
 
         service_request (service.gpio, gpio.configure, led.handle, gpio.configureArgs.output.pushPull)
 

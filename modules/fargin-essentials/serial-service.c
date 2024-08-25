@@ -255,15 +255,11 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
 
     bool fault = false ;
 
-    serviceBuffer_reset (svcBuf) ;
-
     // wait for the message prefix
-    while (1)
-    {
-        txfr.checksum = 0 ;
-        if (rxChar (& txfr) == MessagePrefix)
-            break ;
-    }
+    while (rxChar (& txfr) != MessagePrefix) {}
+
+    serviceBuffer_reset (svcBuf) ;
+    txfr.checksum = 0 ;
 
 
     while (! fault)
@@ -274,6 +270,14 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
         {
             default  :  fault = true ;  break ;
             case ' ' :                  break ;
+
+            case MessagePrefix :
+            {
+                serviceBuffer_reset (svcBuf) ;
+                txfr.checksum = 0 ;
+                fault = false ;
+                break ;
+            }
 
             case Prefix_Unsigned :
             {
@@ -315,10 +319,15 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
 
             case Prefix_Checksum :
             {
+                uint32_t cksum ;
+                fault = ! rxUnsigned (& txfr, & cksum) ;
 
+              #if 1
                 // tbd
+                fault = false ;
+              #endif
 
-                break ;
+                return ! fault ;
             }
         }
 
@@ -447,12 +456,12 @@ static void tx_Checksum (SerialSvcTxfr * txfr)
     tx_Bitfield32 (txfr, checksumCopy) ;
 
     txChar (txfr, ' ') ;
-    txChar (txfr, '\r') ;
+    txChar (txfr, '\n') ;
 }
 
 
 
-bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr)
+bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr, bool serviceResult)
 {
     // this is going to be a lot easier than the complementary receive function
 
@@ -464,6 +473,8 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr)
 
     txChar (& txfr, MessagePrefix) ;
 
+    tx_Boolean (& txfr, serviceResult) ;
+
     while (! fault)
     {
         ServiceBufferToken token = serviceBuffer_getNextToken (svcBuf) ;
@@ -472,7 +483,7 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr)
         {
             default                       : fault = true ;                                break ;
 
-            case ServiceBuffer_End        : tx_Checksum   (& txfr) ;                      break ;
+            case ServiceBuffer_End        : tx_Checksum   (& txfr) ;                      return true ;   // tbd
 
             case ServiceBuffer_Nil        : tx_Nil        (& txfr) ;                      break ;
 
