@@ -1,17 +1,10 @@
 
-APPLICATION = blinky
+APPLICATION = lua-coroutines
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
-# the following are built into RIOT
-BOARD ?= adafruit-itsybitsy-m4
-##ARD ?= feather-m0
-
-# the following are not built into RIOT
-##ARD ?= adafruit-trinket-m0
-##ARD ?= sparkfun-thing-plus-samd51
-##ARD ?= makerdiary-nrf52840-m2-kit
+BOARD ?= makerdiary-nrf52840-m2-kit
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of
@@ -29,6 +22,5 @@ USEPKG += lua
 # generate .lua.h header files of .lua files
 BLOBS += $(wildcard *.lua)
 
-
-# this must be the last directive in this file
 include $(RIOTBASE)/Makefile.include
+

@@ -1,10 +1,11 @@
 
-APPLICATION = threads-and-coroutines
+APPLICATION = gpio-objects
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
-BOARD ?= makerdiary-nrf52840-m2-kit
+BOARD ?= feather-m0
+#OARD ?= makerdiary-nrf52840-m2-kit
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of

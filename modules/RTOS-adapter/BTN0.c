@@ -17,7 +17,7 @@ bool BTN0_processRequest (ServiceBuffer * request, ServiceBuffer * response)
   #if defined BTN0_PIN
     buttonPressed = gpio_read (BTN0_PIN) ;
   #else
-    buttonPressed = false ;
+    buttonPressed = 1 ;     // would be 0 if pulled down
     fault = true ;
   #endif
 
