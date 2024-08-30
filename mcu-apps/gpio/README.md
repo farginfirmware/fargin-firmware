@@ -1,6 +1,9 @@
 
 tbd
 
+This "gpio" app ...
+
+
 board requirements
  - [RIOT OS defined board](https://github.com/RIOT-OS/RIOT/tree/master/boards)
  - or compatible MCU

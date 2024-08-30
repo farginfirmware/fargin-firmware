@@ -1,0 +1,11 @@
+
+config BOARD
+    default "trinket-m0" if BOARD_TRINKET_M0
+
+config BOARD_TRINKET_M0
+    bool
+    default y
+    select BOARD_TRINKET_M0_BASE
+
+rsource "Kconfig.trinket-m0-base"
+

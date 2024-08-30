@@ -18,8 +18,7 @@ local gpio = {
 }
 
 -- led0 args
-local off = 0
-local  on = 1
+local ledState = { off = 0, on = 1 }
 
 local function led0_set (state)
     service_request (service.led0, state)
@@ -106,8 +105,8 @@ local function main()
             milliseconds_OFF = 180
         end
 
-        led0_set (on)       delayMilliseconds (milliseconds_ON)
-        led0_set (off)      delayMilliseconds (milliseconds_OFF)
+        led0_set (ledState.on)       delayMilliseconds (milliseconds_ON)
+        led0_set (ledState.off)      delayMilliseconds (milliseconds_OFF)
 
         millisecondPeriod = 250
         dutyCycle         =   0.5

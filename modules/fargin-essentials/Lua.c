@@ -152,12 +152,24 @@ static int service_request (lua_State * L)
     lua_settop (L, 0) ;     // clear the stack
 
 
-    fault |= ! service_processRequest (& request, & response) ;
+  #if defined (BOARD_NATIVE)
 
+    // for the test app running on the PC, the request is transmitted via the
+    // serial port to the target mcu for processing
+
+    tbd - besides the returned response, a result boolean is also needed
+
+    tbd
+
+  #else
+
+    fault |= ! service_processRequest (& request, & response) ;
 
     // push the result of the call to service_processRequest()
     lua_pushboolean (L, fault ? 0 : 1) ;
     ++ numberOfResults ;
+
+  #endif
 
 
     // push all elements of the response

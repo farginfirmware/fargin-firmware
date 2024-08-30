@@ -1,5 +1,5 @@
 
-APPLICATION = blinky
+APPLICATION = gpio
 
 
 # un-comment one of the following BOARDs or specify the BOARD on the command line ;
