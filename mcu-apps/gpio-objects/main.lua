@@ -1,4 +1,5 @@
 
+-- services tightly coupled to requestServers[] in main.c
 local service = {
     time = 0,
     led0 = 1,
@@ -28,18 +29,20 @@ local function delayMilliseconds (milliseconds)
     service_request (service.time, milliseconds)
 end
 
+local function buttonPressed()
+    local buttonState
+    _, buttonState = service_request (service.btn0)
+    return buttonState == 0
+end
+
 
 local GpioOutput = {
     new = function (self, port, bit)
-        local pin
-        pin = {}    -- create the instance
+        local pin = {}    -- create the instance
         setmetatable (pin, self)
         self.__index = self
-
         _, pin.handle = service_request (service.gpio, gpio.getHandle, port, bit)
-
-        service_request (service.gpio, gpio.configure, pin.handle, gpio.configureArgs.output.pushPull)
-
+                        service_request (service.gpio, gpio.configure, pin.handle, gpio.configureArgs.output.pushPull)
         return pin
     end,
 
@@ -51,15 +54,11 @@ local GpioOutput = {
 
 local GpioInput = {
     new = function (self, port, bit)
-        local pin
-        pin = {}    -- create the instance
+        local pin = {}    -- create the instance
         setmetatable (pin, self)
         self.__index = self
-
         _, pin.handle = service_request (service.gpio, gpio.getHandle, port, bit)
-
-        service_request (service.gpio, gpio.configure, pin.handle, gpio.configureArgs.input.pullUp)
-
+                        service_request (service.gpio, gpio.configure, pin.handle, gpio.configureArgs.input.pullUp)
         return pin
     end,
 
@@ -72,10 +71,8 @@ local GpioInput = {
 
 
 local function blink (gpioPin, millisecondPeriod, dutyCycle)
-
     local milliseconds_ON  = millisecondPeriod * dutyCycle
     local milliseconds_OFF = millisecondPeriod - milliseconds_ON
-
     gpioPin:write (0)     delayMilliseconds (milliseconds_ON)
     gpioPin:write (1)     delayMilliseconds (milliseconds_OFF)
 end
@@ -83,34 +80,43 @@ end
 
 local function main()
 
-    local milliseconds_ON
-    local milliseconds_OFF
+    local port, bit
 
-    local millisecondPeriod
-    local dutyCycle
+    port = 0   bit = 25     -- makerdiary-nrf52840-m2-kit
+    local testInput = GpioInput:new (port, bit)
 
-    local D0 = GpioInput :new (0, 16)   -- itsybitsy-m4 D0      tbd
-    local D1 = GpioOutput:new (0, 17)   -- itsybitsy-m4 D1      tbd
+    port = 0   bit = 24     -- makerdiary-nrf52840-m2-kit blue LED
+    local blueLED = GpioOutput:new (port, bit)
+    blueLED:write (1)       -- init high (off)
 
     while true do
 
-        -- default 1 Hz blink rate
-        milliseconds_ON  = 100
-        milliseconds_OFF = 900
+        if testInput:read() == 1 then
+            -- test input is not pulled low
 
-        if D0:read() == 0 then
-            -- input was pulled low
-            -- 5 Hz blink rate
-            milliseconds_ON  =  20
-            milliseconds_OFF = 180
+            -- default 1 Hz blink rate
+            local milliseconds_ON  = 100
+            local milliseconds_OFF = 900
+
+            if buttonPressed() then
+                -- 2 Hz blink
+                milliseconds_ON  =  50
+                milliseconds_OFF = 450
+            end
+
+            led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
+            led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+
+        else
+            -- test input is pulled low
+
+            local millisecondPeriod = 500
+            local dutyCycle         =   0.1
+
+            -- test gpio output
+            blink (blueLED, millisecondPeriod, dutyCycle)
+
         end
-
-        led0_set (ledState.on)       delayMilliseconds (milliseconds_ON)
-        led0_set (ledState.off)      delayMilliseconds (milliseconds_OFF)
-
-        millisecondPeriod = 250
-        dutyCycle         =   0.5
-        blink (D1, millisecondPeriod, dutyCycle)
 
     end
 

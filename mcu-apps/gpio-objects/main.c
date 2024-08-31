@@ -25,7 +25,7 @@ int main (void)
 {
     service_initialize (requestServers, ArrayLength (requestServers)) ;
 
-    const uint16_t LuaStackBytes =  4000 ;
+    const uint16_t LuaStackBytes =  3000 ;
     const uint32_t LuaHeapBytes  = 30000 ;
     Lua_initialize (LuaStackBytes, LuaHeapBytes) ;
 

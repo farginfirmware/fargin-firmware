@@ -7,16 +7,27 @@ local service = {
     gpio = 3
 }
 
+local gpio = {
+    getHandle = 0,
+    configure = 1,
+         read = 2,
+        write = 3,
+    configureArgs = {
+            input = { noPull=0, pullUp=1, pullDown=2 },
+           output = { pushPull=3, openDrain=4, openDrainPullupEnabled=5 }
+    }
+}
+
 -- led0 args
 local ledState = { off = 0, on = 1 }
 
 
-local function delayMilliseconds (milliseconds)
-    service_request (service.time, milliseconds)    -- service_request() is defined in Lua.c
-end
-
 local function led0_set (state)
     service_request (service.led0, state)
+end
+
+local function delayMilliseconds (milliseconds)
+    service_request (service.time, milliseconds)    -- service_request() is defined in Lua.c
 end
 
 local function buttonPressed()
@@ -59,50 +70,51 @@ end
 local function blink (gpioHandle, millisecondPeriod, dutyCycle)
     local milliseconds_ON  = millisecondPeriod * dutyCycle
     local milliseconds_OFF = millisecondPeriod - milliseconds_ON
-    gpio_write (gpioHandle, 1)      delayMilliseconds (milliseconds_ON)
-    gpio_write (gpioHandle, 0)      delayMilliseconds (milliseconds_OFF)
+    gpio_write (gpioHandle, 0)      delayMilliseconds (milliseconds_ON)
+    gpio_write (gpioHandle, 1)      delayMilliseconds (milliseconds_OFF)
 end
 
 
 
 local function main()
 
-    local milliseconds_ON
-    local milliseconds_OFF
+    local port, bit
 
-    local millisecondPeriod
-    local dutyCycle
+    port = 0   bit = 25     -- makerdiary-nrf52840-m2-kit
+    local testInput = gpio_configureInput  (port, bit)
 
-    local D0 = gpio_configureInput  (0, 16)   -- itsybitsy-m4 D0      tbd
-    local D1 = gpio_configureOutput (0, 17)   -- itsybitsy-m4 D1      tbd
+    port = 0   bit = 24     -- makerdiary-nrf52840-m2-kit blue LED
+    local blueLED = gpio_configureOutput (port, bit)
+    gpio_write (gpioHandle, 1)  -- init high (off)
 
     while true do
 
-        -- default 1 Hz blink rate
-        milliseconds_ON  = 100
-        milliseconds_OFF = 900
+        if gpio_read (testInput) == 1 then
+            -- test input is not pulled low
 
-        if buttonPressed() then
-            -- 2 Hz blink
-            milliseconds_ON  =  50
-            milliseconds_OFF = 450
+            -- default 1 Hz blink rate
+            local milliseconds_ON  = 100
+            local milliseconds_OFF = 900
+
+            if buttonPressed() then
+                -- 2 Hz blink
+                milliseconds_ON  =  50
+                milliseconds_OFF = 450
+            end
+
+            led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
+            led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+
+        else
+            -- test input is pulled low
+
+            local millisecondPeriod = 500
+            local dutyCycle         =   0.1
+
+            -- test gpio output
+            blink (blueLED, millisecondPeriod, dutyCycle)
+
         end
-
-        -- test gpio input
-        if gpio_read (D0) == 0 then
-            -- input was pulled low
-            -- 5 Hz blink rate
-            milliseconds_ON  =  20
-            milliseconds_OFF = 180
-        end
-
-        led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
-        led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
-
-        -- test gpio output
-        millisecondPeriod = 250
-        dutyCycle         =   0.5
-        blink (D1, millisecondPeriod, dutyCycle)
 
     end
 

@@ -10,12 +10,12 @@ local service = {
 local ledState = { off = 0, on = 1 }
 
 
-local function delayMilliseconds (milliseconds)
-    service_request (service.time, milliseconds)    -- service_request() is defined in Lua.c
-end
-
 local function led0_set (state)
     service_request (service.led0, state)
+end
+
+local function delayMilliseconds (milliseconds)
+    service_request (service.time, milliseconds)    -- service_request() is defined in Lua.c
 end
 
 local function buttonPressed()
