@@ -1,18 +1,14 @@
 
 
+Lua takes a lot of code (flash) and data (RAM) space.
+
 
 blinky
-blinky-with-button
-blinky-with-more-gpio
-threads-and-coroutines
+gpio
+gpio-objects
+lua-coroutines
 
-blinky-via-serial-service
-files
-sandbox
-service-via-bluetooth
-service-via-uart
-service-via-usb
-stock
+service-via-stdio
 
 
 
@@ -25,4 +21,12 @@ test platforms
  - [Makerdiary nRF52840 M.2 developer kit](https://makerdiary.com/products/nrf52840-m2-developer-kit)
  - [Makerdiary nRF52840-MDK IoT Development Kit](https://www.tindie.com/products/makerdiary/nrf52840-mdk-iot-development-kit/)
  - [Makerdiary nRF52840 Connect Kit](https://makerdiary.com/products/nrf52840-connectkit)
+
+
+my test boards
+    daplink or
+    UF2 bootloader
+
+bootloader
+    the fargin framework does not include a bootloader
 

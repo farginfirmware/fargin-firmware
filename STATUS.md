@@ -1,12 +1,17 @@
 # Fargin Firmware STATUS
 
 
-working on serial service
-
-
 ready to run examples in folder mcu-apps/
-- blinky
-- blinky-with-button
-- blinky-with-more-gpio
-- threads-and-coroutines
+ - blinky
+ - gpio
+ - gpio-objects
+ - lua-coroutines
+
+currently working on service-via-stdio
+
+
+
+external dependencies
+ - [Lua 5.3](https://www.lua.org/versions.html#5.3) package
+ - [RIOT OS 2024.07](https://github.com/RIOT-OS/RIOT/tree/2024.07-branch) which includes
 

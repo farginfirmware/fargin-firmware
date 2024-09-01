@@ -1,4 +1,11 @@
 
+#if 0
+
+    consider modifying this to allow multiple simultaneous Lua states
+
+#endif
+
+
 #include "Lua.h"
 
 #include <errno.h>

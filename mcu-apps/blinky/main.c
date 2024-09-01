@@ -29,7 +29,7 @@ int main (void)
     //
     // increase these for bigger Lua apps on microcontrollers with more code and data space
     //
-    const uint16_t LuaStackBytes =  2048 ;
+    const uint16_t LuaStackBytes =  2000 ;
     const uint32_t LuaHeapBytes  = 20000 ;
 
     Lua_initialize (LuaStackBytes, LuaHeapBytes) ;

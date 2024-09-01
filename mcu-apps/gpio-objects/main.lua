@@ -22,7 +22,7 @@ local gpio = {
 local ledState = { off = 0, on = 1 }
 
 local function led0_set (state)
-    service_request (service.led0, state)
+    service_request (service.led0, state)   -- service_request() is defined in Lua.c
 end
 
 local function delayMilliseconds (milliseconds)
@@ -30,12 +30,14 @@ local function delayMilliseconds (milliseconds)
 end
 
 local function buttonPressed()
+    local serviceRequestResult  -- ignored
     local buttonState
-    _, buttonState = service_request (service.btn0)
+    serviceRequestResult, buttonState = service_request (service.btn0)
     return buttonState == 0
 end
 
 
+-- "class" definition for a gpio output
 local GpioOutput = {
     new = function (self, port, bit)
         local pin = {}    -- create the instance
@@ -52,6 +54,7 @@ local GpioOutput = {
 }
 
 
+-- "class" definition for a gpio input
 local GpioInput = {
     new = function (self, port, bit)
         local pin = {}    -- create the instance
@@ -82,12 +85,12 @@ local function main()
 
     local port, bit
 
-    port = 0   bit = 25     -- makerdiary-nrf52840-m2-kit
+    port = 0   bit = 25     -- makerdiary-nrf52840-mdk-iot-kit
     local testInput = GpioInput:new (port, bit)
 
-    port = 0   bit = 24     -- makerdiary-nrf52840-m2-kit blue LED
+    port = 0   bit = 24     -- makerdiary-nrf52840-mdk-iot-kit blue LED
     local blueLED = GpioOutput:new (port, bit)
-    blueLED:write (1)       -- init high (off)
+    blueLED:write (1)       -- initialize off
 
     while true do
 

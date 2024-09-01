@@ -2,6 +2,9 @@
 
 This "gpio-objects" app ... tbd
 
+like the "gpio" app except it uses the Lua object-oriented paradigm
+
+
 is intended to run on any
 [RIOT OS defined board](https://github.com/RIOT-OS/RIOT/tree/master/boards)
 which includes LED0.  (Most boards have at least LED0.) Some small MCUs might

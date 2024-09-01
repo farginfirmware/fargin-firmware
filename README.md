@@ -4,11 +4,16 @@ This repository is for the development (in progress) of the
 [FarginFirmware](http://www.farginFirmware.com) framework
 for microcontroller-based embedded systems.
 
-FarginFirmware is built on top of [Lua](http://www.lua.org) and
-[RIOT OS](http://www.riot-os.org) ("The friendly Operating System for the Internet of Things").
+FarginFirmware is built on top of [Lua](http://www.lua.org/about.html) and
+[RIOT OS](http://www.riot-os.org) ("The friendly Operating System for the
+Internet of Things").
 
-- application complexities are the domain of Lua
-- mcu and board hardware are the domain of RIOT OS
+Lua provides:
+ - low threshold / high ceiling application programming
+
+RIOT OS provides:
+ - portability
+ - ease of use
 
 What's so ~~great~~ ~~special~~ different about this firmware framework?
 
@@ -17,7 +22,7 @@ What's so ~~great~~ ~~special~~ different about this firmware framework?
   - with low error potential
   - and a high degree of testability
   - is written entirely in C
-  - is highly portable
+  - is highly portable (runs on [these RIOT OS CPUs](https://www.riot-os.org/cpus.html))
   - obviates the need for a bootloader
 
 - the application is written in Lua
@@ -37,12 +42,15 @@ What's so ~~great~~ ~~special~~ different about this firmware framework?
 
 examples in folder mcu-apps/
 - blinky
-- blinky-with-button
-- blinky-with-more-gpio
-- threads-and-coroutines
+- gpio
+- gpio-objects
+- lua-coroutines
 - etc (tbd ... in progress)
 
+folder pc-apps
+ - tbd
+
 external references:
-- [RIOT OS 2024.01](https://github.com/RIOT-OS/RIOT/tree/2024.01-branch) which includes
+- [RIOT OS 2024.07](https://github.com/RIOT-OS/RIOT/tree/2024.07-branch) which includes
 - a [Lua 5.3](https://www.lua.org/versions.html#5.3) package
 

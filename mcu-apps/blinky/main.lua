@@ -9,13 +9,12 @@ local service = {
 -- led0 args
 local ledState = { off = 0, on = 1 }
 
-
 local function led0_set (state)
-    service_request (service.led0, state)
+    service_request (service.led0, state)   -- service_request() is defined in Lua.c
 end
 
 local function delayMilliseconds (milliseconds)
-    service_request (service.time, milliseconds)    -- service_request() is defined in Lua.c
+    service_request (service.time, milliseconds)
 end
 
 local function buttonPressed()
@@ -28,14 +27,11 @@ end
 
 local function main()
 
-    local milliseconds_ON
-    local milliseconds_OFF
-
     while true do
 
         -- default 1 Hz blink rate
-        milliseconds_ON  = 100
-        milliseconds_OFF = 900
+        local milliseconds_ON  = 100
+        local milliseconds_OFF = 900
 
         if buttonPressed() then
             -- 2 Hz blink
