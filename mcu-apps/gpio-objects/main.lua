@@ -7,6 +7,7 @@ local service = {
     gpio = 3
 }
 
+-- gpio args (see ff.gpio.c)
 local gpio = {
     getHandle = 0,
     configure = 1,

@@ -304,11 +304,13 @@ bool serviceBuffer_getUnsigned32 (ServiceBuffer * svcBuf, uint32_t * result)
             break ;
 
         case ServiceBuffer_Real :
-            fault = (floor (nextToken.real) != nextToken.real) ||
-                    (nextToken.real < 0) || (nextToken.real > UINT32_MAX) ;
+        {
+            fault = (nextToken.real < 0) ||
+                    (nextToken.real > UINT32_MAX) ;
             if (! fault)
-                * result = nextToken.real ;
+                * result = floor (nextToken.real) ;
             break ;
+        }
     }
 
     return ! fault ;

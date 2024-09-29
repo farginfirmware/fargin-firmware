@@ -23,11 +23,10 @@ bool time_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 
     uint32_t milliseconds ;
 
-    bool fault = ! serviceBuffer_getUnsigned32 (request, & milliseconds) ||
-                   (milliseconds > UINT16_MAX) ;
+    bool fault = ! serviceBuffer_getUnsigned32 (request, & milliseconds) ;
 
     if (! fault)
-        time_delayMilliseconds (milliseconds) ;
+        time_delayMilliseconds (milliseconds <= UINT16_MAX ? milliseconds : UINT16_MAX) ;
 
     return ! fault ;
 }

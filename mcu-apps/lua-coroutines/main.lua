@@ -1,19 +1,13 @@
 
---[[
-    This file would normally be only Lua startup code.
-    This is not intended to be the whole app (although it certainly could be).
-    But for this and other examples, this is the whole Lua app.
-]]
-
-
 -- services tightly coupled to requestServers[] in main.c
 local service = {
-    test = 0,   -- not used in this app
-    time = 1,
-    gpio = 2
+    time = 0,
+    led0 = 1,
+    btn0 = 2,
+    gpio = 3
 }
 
--- gpio args (see gpio.c)
+-- gpio args (see ff.gpio.c)
 local gpio = {
     getHandle = 0,
     configure = 1,
@@ -25,74 +19,121 @@ local gpio = {
     }
 }
 
+-- led0 args
+local ledState = { off = 0, on = 1 }
+
+local function led0_set (state)
+    service_request (service.led0, state)   -- service_request() is defined in Lua.c
+end
 
 local function delayMilliseconds (milliseconds)
     service_request (service.time, milliseconds)
 end
 
+local function buttonPressed()
+    local serviceRequestResult  -- ignored
+    local buttonState
+    serviceRequestResult, buttonState = service_request (service.btn0)
+    return buttonState == 0
+end
 
--- this is the prototype for the red, green and blue LEDs
--- it is analogous to an object-oriented class definition
-local LED = {
+
+-- "class" definition for a gpio output
+local GpioOutput = {
     new = function (self, port, bit)
-        led = {}    -- create the instance
-        setmetatable (led, self)
+        local pin = {}    -- create the instance
+        setmetatable (pin, self)
         self.__index = self
-
-        _, led.handle = service_request (service.gpio, gpio.getHandle, port, bit)
-
-        service_request (service.gpio, gpio.configure, led.handle, gpio.configureArgs.output.pushPull)
-
-        return led
+        _, pin.handle = service_request (service.gpio, gpio.getHandle, port, bit)
+                        service_request (service.gpio, gpio.configure, pin.handle, gpio.configureArgs.output.pushPull)
+        return pin
     end,
 
-    set = function (self, state)
+    write = function (self, state)
         service_request (service.gpio, gpio.write, self.handle, state)
     end
 }
 
 
-local function blink (led, millisecondPeriod, dutyCycle)
+-- "class" definition for a gpio input
+local GpioInput = {
+    new = function (self, port, bit)
+        local pin = {}    -- create the instance
+        setmetatable (pin, self)
+        self.__index = self
+        _, pin.handle = service_request (service.gpio, gpio.getHandle, port, bit)
+                        service_request (service.gpio, gpio.configure, pin.handle, gpio.configureArgs.input.pullUp)
+        return pin
+    end,
 
+    read = function (self)
+        local pin
+        _, pin = service_request (service.gpio, gpio.read, self.handle)
+        return pin
+    end
+}
+
+
+-- there are expected to be multiple instances of this coroutine
+local function blink (led, millisecondPeriod, dutyCycle)
     local milliseconds_ON  = millisecondPeriod * dutyCycle
     local milliseconds_OFF = millisecondPeriod - milliseconds_ON
-
     while true do
-        coroutine.yield ()
-        led:set (0)     delayMilliseconds (milliseconds_ON)
-        led:set (1)     delayMilliseconds (milliseconds_OFF)
+        local blinkFaster = coroutine.yield ()
+        local divisor = 1
+        if blinkFaster then divisor = 2 end
+        led:write (0)   delayMilliseconds (milliseconds_ON  / divisor)
+        led:write (1)   delayMilliseconds (milliseconds_OFF / divisor)
     end
 end
 
 
 local function main()
 
-    local red   = LED:new (0, 30)
-    local green = LED:new (0, 29)
-    local blue  = LED:new (0, 31)
+    local port, bit
 
-    local allLeds = { red, green, blue }
+    port = 0   bit = 25                     -- makerdiary-nrf52840-mdk-iot-kit
+    local testInput = GpioInput:new (port, bit)
 
-    local blink_RED   = coroutine.create (blink)
-    local blink_GREEN = coroutine.create (blink)
-    local blink_BLUE  = coroutine.create (blink)
-
-    local allBlink = { blink_RED, blink_GREEN, blink_BLUE}
-
-    coroutine.resume (blink_RED,     red,  500, 0.25)
-    coroutine.resume (blink_GREEN, green, 1000, 0.25)
-    coroutine.resume (blink_BLUE,   blue, 1500, 0.25)
+    local blinkAll = {}
+    port = 0
+    for _, bit in ipairs {22, 23, 24} do    -- makerdiary-nrf52840-mdk-iot-kit green, red, blue LEDs
+        local pin = GpioOutput:new (port, bit)
+        local blinkOne = coroutine.create (blink)
+        coroutine.resume (blinkOne, pin, 500, 0.25)
+        table.insert (blinkAll, blinkOne)
+    end
 
     while true do
 
-        -- blink 1 at a time
-        for _, blink in ipairs (allBlink) do coroutine.resume (blink) end
+        local blinkFaster = buttonPressed()
 
-        -- turn them all on
-        for _, led in ipairs (allLeds) do led:set (0) end   delayMilliseconds (2000)
+        if testInput:read() == 1 then
+            -- test input is not pulled low
 
-        -- turn them all off
-        for _, led in ipairs (allLeds) do led:set (1) end   delayMilliseconds (1000)
+            -- default 1 Hz blink rate
+            local milliseconds_ON  = 100
+            local milliseconds_OFF = 900
+
+            if blinkFaster then
+                -- 2 Hz blink
+                milliseconds_ON  =  50
+                milliseconds_OFF = 450
+            end
+
+            led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
+            led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+
+        else
+            -- test input is pulled low
+            -- blink the 3 LEDs one at a time
+
+            for _, blinkOne in ipairs (blinkAll) do
+                coroutine.resume (blinkOne, blinkFaster)
+            end
+            delayMilliseconds (1000)
+
+        end
 
     end
 

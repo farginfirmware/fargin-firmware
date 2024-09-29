@@ -1,6 +1,7 @@
 
 
 
-Also, see [Creating an out of tree application structure](https://doc.riot-os.org/creating-an-application.html#autotoc_md2078)
+Also, see [Creating an out of tree application
+structure](https://doc.riot-os.org/creating-an-application.html#autotoc_md2078)
 
 
