@@ -14,6 +14,8 @@ may also include response data. In this example, Lua uses service buffers to
 send requests for LED0, BTN0 and time services. LED0 and time services do not
 return any data. BTN0 service returns the state of the button.
 
+![fargin framework]()
+
 This app should run on any
 [RIOT OS defined board](https://github.com/RIOT-OS/RIOT/tree/master/boards)
 which includes LED0 (and which has enough code and data space).

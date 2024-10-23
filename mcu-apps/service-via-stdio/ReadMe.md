@@ -2,7 +2,12 @@
 "service-via-stdio"
 
 
-THIS APP IS STILL IN DEVELOPMENT - i.e. it is not ready to run
+THIS APP IS STILL IN DEVELOPMENT - i.e. it is not ready to run  tbd
+
+
+minimal main.lua because this is about serial service
+
+![INSERT BLOCK DIAGRAM HERE](/assets/images/tux.png)
 
 
 nevertheless...

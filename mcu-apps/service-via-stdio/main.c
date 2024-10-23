@@ -26,10 +26,13 @@ int main (void)
 {
     service_initialize (requestServers, ArrayLength (requestServers)) ;
 
-    const uint16_t LuaStackBytes =  4096 ;
-    const uint32_t LuaHeapBytes  = 40000 ;
+    // this example isn't really about Lua, but we're going to let it run
+    // anyway in parallel with serial service
+    const uint16_t LuaStackBytes =  3000 ;
+    const uint32_t LuaHeapBytes  = 30000 ;
     Lua_initialize (LuaStackBytes, LuaHeapBytes) ;
 
+    // serial service is what this example is really about
     serviceViaStdio_initialize () ;
 
     thread_sleep () ;

@@ -1,54 +1,35 @@
 
 -- services tightly coupled to requestServers[] in main.c
-local time = 0
-local led0 = 1
-local btn0 = 2
+local service = {
+    time = 0,
+    led0 = 1,
+}
 
 -- led0 args
-local off = 0
-local  on = 1
-
-
-local function delayMilliseconds (milliseconds)
-    service_request (time, milliseconds)    -- service_request() is defined in Lua.c
-end
+local ledState = { off = 0, on = 1 }
 
 local function led0_set (state)
-    service_request (led0, state)
+    service_request (service.led0, state)   -- service_request() is defined in Lua.c
 end
 
-local function buttonPressed()
-    local serviceRequestResult
-    local buttonState
-    serviceRequestResult, buttonState = service_request (btn0)
-    return buttonState == 0
+local function delayMilliseconds (milliseconds)
+    service_request (service.time, milliseconds)
 end
 
 
 local function main()
 
-    local milliseconds_ON
-    local milliseconds_OFF
+    local periodMilliseconds = 10e3     -- 0.1 Hz
+    local dutyCycle = 0.5               -- 50%
+    local milliseconds_ON  = periodMilliseconds * dutyCycle
+    local milliseconds_OFF = periodMilliseconds - milliseconds_ON
 
     while true do
-
-        if buttonPressed() then
-            -- 5 Hz blink
-            milliseconds_ON  =  25
-            milliseconds_OFF = 175
-        else
-            -- 1 Hz blink
-            milliseconds_ON  = 100
-            milliseconds_OFF = 900
-        end
-
-        led0_set (on)   delayMilliseconds (milliseconds_ON)
-        led0_set (off)  delayMilliseconds (milliseconds_OFF)
-
+        led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
+        led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
     end
 
 end
-
 
 main()  -- execute the function defined above
 
