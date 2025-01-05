@@ -1,5 +1,5 @@
 
-#include "character.h"
+#include "character.h"  // _CHARACTER_INCLUDED_
 
 
 static const char * hexDigits = "0123456789abcdef" ;

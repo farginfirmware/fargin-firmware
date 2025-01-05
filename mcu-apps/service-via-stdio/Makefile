@@ -1,9 +1,23 @@
 APPLICATION = service-via-stdio
 
+
+# un-comment one of the following BOARDs or specify the BOARD on the command line ;
+# for example:
+#   make BOARD=feather-m0 flash
+
+    # the following are built into RIOT
+    #   BOARD ?= adafruit-itsybitsy-m4      why did I use this one before?
+    #   BOARD ?= feather-m0
+
+    # the following are not built into RIOT
+    #   BOARD ?= trinket-m0
+    #   BOARD ?= sparkfun-thing-plus-samd51
+    #   BOARD ?= makerdiary-nrf52840-m2-kit
+        BOARD ?= makerdiary-nrf52840-mdk-iot-kit
+
+
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
-
-BOARD ?= adafruit-itsybitsy-m4
 
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of

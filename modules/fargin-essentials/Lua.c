@@ -6,7 +6,7 @@
 #endif
 
 
-#include "Lua.h"
+#include "Lua.h"    // _LUA_H_
 
 #include <errno.h>
 #include <malloc.h>

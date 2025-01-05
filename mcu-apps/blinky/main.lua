@@ -29,15 +29,13 @@ local function main()
 
     while true do
 
-        -- default 1 Hz blink rate
-        local milliseconds_ON  = 100
-        local milliseconds_OFF = 900
-
+        local period = 1000         -- default 1 Hz blink rate
         if buttonPressed() then
-            -- 2 Hz blink
-            milliseconds_ON  =  50
-            milliseconds_OFF = 450
+            period = period / 2     -- double the rate
         end
+
+        local milliseconds_ON  = period * 0.20      -- 20% duty cycle
+        local milliseconds_OFF = period - milliseconds_ON
 
         led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
         led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)

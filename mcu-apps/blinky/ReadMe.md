@@ -18,5 +18,6 @@ return any data. BTN0 service returns the state of the button.
 
 This app should run on any
 [RIOT OS defined board](https://github.com/RIOT-OS/RIOT/tree/master/boards)
-which includes LED0 (and which has enough code and data space).
+which includes LED0 (and which has enough code and data space) and, optionally,
+BTN0.
 

@@ -1,5 +1,5 @@
 
-#include "ff.spi.h"
+#include "ff.spi.h"     // _SPI_H_
 
 #include "board.h"
 #include "periph/spi.h"     // PERIPH_SPI_H
