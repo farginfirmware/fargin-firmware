@@ -3,6 +3,8 @@
 local service = {
     time = 0,
     led0 = 1,
+    btn0 = 2,
+    gpio = 3
 }
 
 -- led0 args
@@ -16,17 +18,29 @@ local function delayMilliseconds (milliseconds)
     service_request (service.time, milliseconds)
 end
 
+local function buttonPressed()
+    local serviceRequestResult  -- ignored
+    local buttonState
+    serviceRequestResult, buttonState = service_request (service.btn0)
+    return buttonState == 0
+end
+
 
 local function main()
 
-    local periodMilliseconds = 10e3     -- 0.1 Hz
-    local dutyCycle = 0.5               -- 50%
-    local milliseconds_ON  = periodMilliseconds * dutyCycle
-    local milliseconds_OFF = periodMilliseconds - milliseconds_ON
-
     while true do
+
+        local period = 1000         -- default 1 Hz blink rate
+        if buttonPressed() then
+            period = period / 2     -- double the rate
+        end
+
+        local milliseconds_ON  = period * 0.20      -- 20% duty cycle
+        local milliseconds_OFF = period - milliseconds_ON
+
         led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
         led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+
     end
 
 end

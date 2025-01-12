@@ -18,6 +18,7 @@ endif
 USEMODULE += fargin-essentials
 USEMODULE += RTOS-adapter
 USEMODULE += app-independent-utils
+USEMODULE += dotstar
 
 #RIOT OS modules
 USEMODULE += apa102

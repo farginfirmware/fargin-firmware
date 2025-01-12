@@ -16,5 +16,9 @@
 #define LED0_OFF            (LED_PORT.OUTCLR.reg = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
 
+#define APA102_PARAM_LED_NUMOF      (1)
+#define APA102_PARAM_DATA_PIN       GPIO_PIN(PA, 0)
+#define APA102_PARAM_CLK_PIN        GPIO_PIN(PA, 1)
+
 
 #endif

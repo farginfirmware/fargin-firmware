@@ -58,23 +58,21 @@ local function main()
     dotstar_setSaturation (dotstar.index, dotstar.saturation)
 
     while true do
+
+        while buttonPressed() do
+            led0_set (ledState.on)      delayMilliseconds ( 25)
+            led0_set (ledState.off)     delayMilliseconds (475)
+        end
+
         hue = (hue + 1) % 360
         dotstar_setHue (dotstar.index, hue)
         delayMilliseconds (100)
-    end
 
-    while true do
-
-        local period = 1000         -- default 1 Hz blink rate
-        if buttonPressed() then
-            period = period / 2     -- double the rate
+        if hue % 30 == 0 then
+            led0_set (ledState.on)
+            delayMilliseconds (25)
+            led0_set (ledState.off)
         end
-
-        local milliseconds_ON  = period * 0.20      -- 20% duty cycle
-        local milliseconds_OFF = period - milliseconds_ON
-
-        led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
-        led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
 
     end
 

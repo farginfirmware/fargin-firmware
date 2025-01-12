@@ -92,12 +92,12 @@ local function main()
 
     local port, bit
 
-    port = 0   bit = 25                     -- makerdiary-nrf52840-mdk-iot-kit
+    port = 0   bit = 25                     -- makerdiary-nrf52840-mdk-iot-kit  tbd
     local testInput = GpioInput:new (port, bit)
 
     local blinkAll = {}
     port = 0
-    for _, bit in ipairs {22, 23, 24} do    -- makerdiary-nrf52840-mdk-iot-kit green, red, blue LEDs
+    for _, bit in ipairs {22, 23, 24} do    -- makerdiary-nrf52840-mdk-iot-kit green, red, blue LEDs    tbd
         local pin = GpioOutput:new (port, bit)
         local blinkOne = coroutine.create (blink)
         coroutine.resume (blinkOne, pin, 500, 0.25)

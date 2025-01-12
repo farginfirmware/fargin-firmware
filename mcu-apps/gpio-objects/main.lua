@@ -86,10 +86,10 @@ local function main()
 
     local port, bit
 
-    port = 0   bit = 25     -- makerdiary-nrf52840-mdk-iot-kit
+    port = 0   bit = 25     -- adafruit-grand-central-m4-express        tbd
     local testInput = GpioInput:new (port, bit)
 
-    port = 0   bit = 24     -- makerdiary-nrf52840-mdk-iot-kit blue LED
+    port = 0   bit = 24     -- adafruit-grand-central-m4-express        tbd
     local blueLED = GpioOutput:new (port, bit)
     blueLED:write (1)       -- initialize off
 

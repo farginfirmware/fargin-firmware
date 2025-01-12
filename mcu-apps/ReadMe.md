@@ -5,6 +5,8 @@ continually developed.
 
 The following mcu apps are ready to run. Each has its own ReadMe.md file.
  - blinky
+ - dotstar-blinky
+ - fargin-firmware-blinky
  - gpio
  - gpio-objects
  - lua-coroutines

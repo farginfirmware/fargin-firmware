@@ -80,14 +80,22 @@ local function main()
 
     local port, bit
 
-    port = 0   bit = 25     -- makerdiary-nrf52840-mdk-iot-kit
+    -- PA07 is
+    --  D3  on the trinket-m0
+    --  D2  on the itsybitsy-m4
+    port = 0   bit = 7
     local testInput = gpio_configureInput (port, bit)
 
-    port = 0   bit = 24     -- makerdiary-nrf52840-mdk-iot-kit
-    local blueLED = gpio_configureOutput (port, bit)
-    gpio_write (gpioHandle, 1)  -- init high (off)
+--  port = 0   bit = 24
+--  local blueLED = gpio_configureOutput (port, bit)
+--  gpio_write (gpioHandle, 1)  -- init high (off)
 
     while true do
+
+        while gpio_read (testInput) == 0 do
+            led0_set (ledState.on)      delayMilliseconds ( 25)
+            led0_set (ledState.off)     delayMilliseconds (225)
+        end
 
         if gpio_read (testInput) == 1 then
             -- test input is not pulled low
@@ -112,7 +120,7 @@ local function main()
             local dutyCycle         =   0.1
 
             -- test gpio output
-            blink (blueLED, millisecondPeriod, dutyCycle)
+--          blink (blueLED, millisecondPeriod, dutyCycle)
 
         end
 
