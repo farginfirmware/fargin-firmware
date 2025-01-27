@@ -4,13 +4,9 @@ fargin firmware framework works. It is not complete - rather, it is being
 continually developed.
 
 The following mcu apps are ready to run. Each has its own ReadMe.md file.
- - blinky
- - dotstar-blinky
- - fargin-firmware-blinky
- - gpio
- - gpio-objects
- - lua-coroutines
- - serial-via-stdio
+ - blinky.lua       partial fargin framework implementation
+ - blinky.dotstar   works with boards with a dotstar LED
+ - blinky.ff        full fargin framework implementation
 
 These apps were tested on the following boards. 
  - boards with existing RIOT OS board definitions

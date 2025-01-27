@@ -1,7 +1,7 @@
 
-"lua-coroutines"
+"lua.coroutines"
 
-This app is similar to the "gpio-objects" app, but with the introduction of Lua
+This app is similar to the "gpio.objects" app, but with the introduction of Lua
 coroutines.
 
 The same gpio classes are used:

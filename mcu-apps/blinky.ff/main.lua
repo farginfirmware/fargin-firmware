@@ -1,6 +1,9 @@
 
+-- tbd add coroutines ?
+
+
 -- services tightly coupled to requestServers[] in main.c
-local service = {
+service = {
     time = 0,
     led0 = 1,
     btn0 = 2,
@@ -8,17 +11,17 @@ local service = {
 }
 
 -- led0 args
-local ledState = { off = 0, on = 1 }
+ledState = { off = 0, on = 1 }
 
-local function led0_set (state)
+function led0_set (state)
     service_request (service.led0, state)   -- service_request() is defined in Lua.c
 end
 
-local function delayMilliseconds (milliseconds)
+function delayMilliseconds (milliseconds)
     service_request (service.time, milliseconds)
 end
 
-local function buttonPressed()
+function buttonPressed()
     local serviceRequestResult  -- ignored
     local buttonState
     serviceRequestResult, buttonState = service_request (service.btn0)

@@ -1,5 +1,5 @@
 
-"dotstar-blinky"
+"blinky.dotstar"
 
 This mcu app works on boards with a single dotstar LED. 
 

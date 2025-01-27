@@ -1,9 +1,9 @@
 
-APPLICATION = dotstar-blinky
+APPLICATION = blinky.lua
 
 # the definition for the following BOARD is found in the RIOT/boards folder
 BOARD ?= adafruit-itsybitsy-m4
-# ... but this app should run on just about any board with a Dotstar LED
+# ... but this blinky app should run on just about any board which defines LED0
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
@@ -18,11 +18,6 @@ endif
 USEMODULE += fargin-essentials
 USEMODULE += RTOS-adapter
 USEMODULE += app-independent-utils
-USEMODULE += dotstar
-
-#RIOT OS modules
-USEMODULE += apa102
-USEMODULE += color
 
 USEPKG += lua
 

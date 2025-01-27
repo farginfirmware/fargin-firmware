@@ -1,5 +1,5 @@
 
-APPLICATION = lua-coroutines
+APPLICATION = lua.coroutines
 
 # the gpio-related code in main.lua is written for:
 BOARD ?= adafruit-grand-central-m4-express

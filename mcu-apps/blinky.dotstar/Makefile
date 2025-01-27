@@ -1,5 +1,9 @@
 
-APPLICATION = service-via-uart
+APPLICATION = blinky.dotstar
+
+# the definition for the following BOARD is found in the RIOT/boards folder
+BOARD ?= adafruit-itsybitsy-m4
+# ... but this app should run on just about any board with a Dotstar LED
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
@@ -10,12 +14,15 @@ ifneq ($(BOARD),native)
   CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
 endif
 
-USEMODULE += periph_uart
-
 #FarginFirmware modules
 USEMODULE += fargin-essentials
 USEMODULE += RTOS-adapter
 USEMODULE += app-independent-utils
+USEMODULE += dotstar
+
+#RIOT OS modules
+USEMODULE += apa102
+USEMODULE += color
 
 USEPKG += lua
 
@@ -25,4 +32,3 @@ BLOBS += $(wildcard *.lua)
 
 # this must be the last directive in this file
 include $(RIOTBASE)/Makefile.include
-

@@ -2,7 +2,7 @@
 
 This repository is for the development (in progress) of the
 [FarginFirmware](http://www.farginFirmware.com) framework
-for microcontroller-based embedded systems.
+for microcontroller-based systems.
 
 FarginFirmware is built on top of [Lua](http://www.lua.org/about.html) and
 [RIOT OS](http://www.riot-os.org) ("The friendly Operating System for the
@@ -41,16 +41,17 @@ What's so ~~great~~ ~~special~~ different about this firmware framework?
 
 
 examples in folder mcu-apps/
-- blinky
+- blinky.lua
+- blinky.ff (in progress)
 - gpio
-- gpio-objects
-- lua-coroutines
+- gpio.objects
+- lua.coroutines
 - etc (tbd ... in progress)
 
 folder pc-apps
  - tbd
 
 external references:
-- [RIOT OS 2024.07](https://github.com/RIOT-OS/RIOT/tree/2024.07-branch) which includes
+- [RIOT OS 2024.10](https://github.com/RIOT-OS/RIOT/tree/2024.10-branch) which includes
 - a [Lua 5.3](https://www.lua.org/versions.html#5.3) package
 

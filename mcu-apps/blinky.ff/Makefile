@@ -1,5 +1,5 @@
 
-APPLICATION = fargin-firmware-blinky
+APPLICATION = blinky.ff     # FarginFirmware blinky
 
 
 # the definition for the following BOARD is found in the RIOT/boards folder
