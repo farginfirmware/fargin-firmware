@@ -1,9 +1,12 @@
 
-APPLICATION = blinky.lua
+APPLICATION = blinky.serial-service
 
-# the definition for the following BOARD is found in the RIOT/boards folder
-BOARD ?= adafruit-itsybitsy-m4
-# ... but this blinky app should run on just about any board which defines LED0
+
+# build it
+    # make BOARD = adafruit-itsybitsy-m4
+
+# flash it
+    # make BOARD = adafruit-itsybitsy-m4  flash
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
@@ -23,6 +26,15 @@ USEPKG += lua
 
 # generate .lua.h header files of .lua files
 BLOBS += $(wildcard *.lua)
+
+USEMODULE += stdio_cdc_acm  ## ??
+USEMODULE += stdin
+USEMODULE += usbus
+USEMODULE += auto_init_usbus
+
+# USB device vendor and product ID
+USB_VID ?= $(USB_VID_TESTING)
+USB_PID ?= $(USB_PID_TESTING)
 
 
 # this must be the last directive in this file

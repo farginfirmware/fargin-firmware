@@ -1,12 +1,12 @@
 
 This folder contains sample projects which are intended to demonstrate how the
-fargin firmware framework works. It is not complete - rather, it is being
-continually developed.
+fargin firmware framework works.
 
 The following mcu apps are ready to run. Each has its own ReadMe.md file.
- - blinky.lua       partial fargin framework implementation
- - blinky.dotstar   works with boards with a dotstar LED
- - blinky.ff        full fargin framework implementation
+ - blinky.minimal           minimal fargin framework
+ - blinky.dotstar           works with boards with a dotstar LED
+ - blinky.serial-service    access mcu services from pc via usb
+ - blinky.full-framework    full fargin framework implementation
 
 These apps were tested on the following boards. 
  - boards with existing RIOT OS board definitions

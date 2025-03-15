@@ -2,8 +2,7 @@
 APPLICATION = blinky.dotstar
 
 # the definition for the following BOARD is found in the RIOT/boards folder
-BOARD ?= adafruit-itsybitsy-m4
-# ... but this app should run on just about any board with a Dotstar LED
+BOARD = adafruit-itsybitsy-m4
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/

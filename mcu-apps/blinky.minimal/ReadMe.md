@@ -1,8 +1,12 @@
 
-"blinky"
+"blinky.minimal"
 
 This app merely blinks an LED (LED0). Pressing a button (BTN0) doubles the
 blink rate.
+
+
+    $make BOARD = adafruit-itsybitsy-m4  flash
+
 
 Most boards define at least LED0. Many boards also define BTN0.
 
