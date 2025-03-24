@@ -1,12 +1,8 @@
 
 "blinky.minimal"
 
-This app merely blinks an LED (LED0). Pressing a button (BTN0) doubles the
-blink rate.
-
-
-    $make BOARD = adafruit-itsybitsy-m4  flash
-
+This app merely blinks an LED (LED0). Pressing a button (BTN0, if it exists)
+doubles the blink rate.
 
 Most boards define at least LED0. Many boards also define BTN0.
 
@@ -17,8 +13,6 @@ native mcu code. An associated response buffer returns a result indication and
 may also include response data. In this example, Lua uses service buffers to
 send requests for LED0, BTN0 and time services. LED0 and time services do not
 return any data. BTN0 service returns the state of the button.
-
-![fargin framework]()
 
 This app should run on any
 [RIOT OS defined board](https://github.com/RIOT-OS/RIOT/tree/master/boards)

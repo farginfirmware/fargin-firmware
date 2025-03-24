@@ -1,12 +1,14 @@
 
 APPLICATION = blinky.serial-service
 
+# default board for development of this app
+BOARD ?= adafruit-itsybitsy-m4
 
 # build it
-    # make BOARD = adafruit-itsybitsy-m4
+    # make BOARD=adafruit-itsybitsy-m4
 
 # flash it
-    # make BOARD = adafruit-itsybitsy-m4  flash
+    # make BOARD=adafruit-itsybitsy-m4  flash
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/

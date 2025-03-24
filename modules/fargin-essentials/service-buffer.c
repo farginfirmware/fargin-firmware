@@ -30,7 +30,7 @@ static bool write (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLengt
     memcpy (svcBuf->buffer + svcBuf->bytesWritten, dataPtr, dataLength) ;
     svcBuf->bytesWritten += dataLength ;
 
-    * (svcBuf->buffer + svcBuf->bytesWritten) = endMarker ;
+    svcBuf->buffer [svcBuf->bytesWritten] = endMarker ;
 
     return true ;
 }
@@ -42,21 +42,22 @@ static bool serviceBuffer_put (ServiceBuffer * svcBuf,
                                uint8_t *       dataPtr,
                                uint16_t        dataLength)
 {
+    // put any token except ServiceBuffer_Bytes
+
     if (svcBuf == NULL)
         return false ;
 
-    uint16_t bytesWritten = svcBuf->bytesWritten ;
+    uint16_t previousBytesWritten = svcBuf->bytesWritten ;
+    svcBuf->lastTokenOffset = previousBytesWritten ;    // set this every time a new token is added
 
     bool fault = ! write (svcBuf, & dataType, sizeof (dataType)) ||
-                 ! write (svcBuf, dataPtr, dataLength) ;
+                 ! write (svcBuf,   dataPtr,          dataLength) ;
 
     if (fault)
     {
         // restore svcBuf to its state prior to calling this function
-        svcBuf->bytesWritten = bytesWritten ;
-
-        dataLength = 0 ;
-        write (svcBuf, dataPtr, dataLength) ;
+        svcBuf->bytesWritten = previousBytesWritten ;
+        write (svcBuf, NULL, 0) ;
     }
 
     return ! fault ;
@@ -113,41 +114,28 @@ bool serviceBuffer_putReal (ServiceBuffer * svcBuf, Real data)
 }
 
 
-bool serviceBuffer_putBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLength)
+
+static bool createEmptyByteArray (ServiceBuffer * svcBuf)
 {
-    /*
-        This function is used to put both zero-terminated strings and byte arrays.
+    // put a ServiceBuffer_Bytes token with a byte array length of 0
+    // i.e. an empty byte array
 
-        Note!!  dataLength represents the actual amount of data
-                i.e.
-                    - either the number of bytes in the byte array or
-                    - the number of bytes in the string not including the terminating zero
+    uint16_t previousBytesWritten = svcBuf->bytesWritten ;
+    svcBuf->lastTokenOffset = previousBytesWritten ;    // set this every time a new token is added
 
-        This function has to append a terminating zero.
-    */
+    uint8_t  dataType        = ServiceBuffer_Bytes ;
+    uint16_t dataLength      = 0 ;
+    uint8_t  terminatingZero = 0 ;
 
-    if (svcBuf == NULL)
-        return false ;
-
-    uint16_t bytesWritten = svcBuf->bytesWritten ;
-
-    uint8_t dataType = ServiceBuffer_Bytes ;
-
-    uint8_t  zero = 0 ;
-    uint16_t dataLengthWithZero = dataLength + sizeof (zero) ;
-
-    bool fault = ! write (svcBuf,             & dataType,           sizeof (dataType))           ||
-                 ! write (svcBuf, (uint8_t *) & dataLengthWithZero, sizeof (dataLengthWithZero)) ||
-                 ! write (svcBuf,               dataPtr,                    dataLength)          ||
-                 ! write (svcBuf,             & zero,               sizeof (zero)) ;
+    bool fault = ! write (svcBuf,             & dataType,         sizeof (dataType))   ||
+                 ! write (svcBuf, (uint8_t *) & dataLength,       sizeof (dataLength)) ||
+                 ! write (svcBuf,             & terminatingZero,  sizeof (terminatingZero)) ;
 
     if (fault)
     {
         // restore svcBuf to its state prior to calling this function
-        svcBuf->bytesWritten = bytesWritten ;
-
-        dataLength = 0 ;
-        write (svcBuf, dataPtr, dataLength) ;
+        svcBuf->bytesWritten = previousBytesWritten ;
+        write (svcBuf, NULL, 0) ;
     }
 
     return ! fault ;
@@ -155,52 +143,112 @@ bool serviceBuffer_putBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t
 
 
 
-bool serviceBuffer_appendByte (ServiceBuffer * svcBuf, uint8_t aByte)
+static bool appendBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLength)
 {
-    // this assumes that serviceBuffer_putBytes() was called immediately prior
+    if (dataLength == 0)
+        return true ;
 
-    // overwrite the preceeding zero with aByte
-    // append a new terminating zero
-    // increment the data length
+    // fail if the last token was not ServiceBuffer_Bytes
+
+    uint16_t lastTokenOffset = svcBuf->lastTokenOffset ;
+    uint8_t  lastToken       = svcBuf->buffer [lastTokenOffset] ;
+
+    if (lastToken != ServiceBuffer_Bytes)
+        return false ;
+
+    // fail if not enough space to append data
+    uint16_t bytesRemaining = svcBuf->bytesCapacity - svcBuf->bytesWritten ;
+    uint8_t endMarker = ServiceBuffer_End ;
+    if (dataLength + sizeof (endMarker) > bytesRemaining)
+        return false ;
+
+    // overwrite starting at previous terminating zero
+
+    svcBuf->bytesWritten -= 1 ;
+    uint8_t zero = 0 ;
+
+    bool fault = ! write (svcBuf, dataPtr, dataLength) ||
+                 ! write (svcBuf, & zero, sizeof (zero)) ;
+
+    if (! fault)
+    {
+        // update the byte array length
+        uint16_t  length ;
+        uint8_t * lengthPtr = svcBuf->buffer + lastTokenOffset + 1 ;
+        memcpy ((uint8_t *) & length, lengthPtr, sizeof (length)) ;     // read it
+        ++ length ;
+        memcpy (lengthPtr, (uint8_t *) & length, sizeof (length)) ;     // write it
+    }
+
+    return ! fault ;
+}
+
+
+
+bool serviceBuffer_appendBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLength)
+{
+    if (svcBuf == NULL)
+        return false ;
+
+    return appendBytes (svcBuf, dataPtr, dataLength) ;
+}
+
+
+
+bool serviceBuffer_putBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLength)
+{
+    /*
+        This function is used to put both strings and byte arrays - both of
+        which will be written with a 0-termination
+
+        Note!!  dataLength represents the actual amount of data
+                i.e.
+                    - either the number of bytes in the byte array or
+                    - the number of bytes in the string not including the terminating zero
+    */
 
     if (svcBuf == NULL)
         return false ;
 
-    bool fault = false ;
-
-#if 1
-    (void) aByte ;
-#else
-
-    // tbd
-
-
-
-
-typedef struct {
-    uint8_t  *  buffer ;
-    uint16_t    bytesCapacity ;
-    uint16_t    bytesWritten ;
-    uint16_t    bytesRead ;
-} ServiceBuffer ;
-
-
-
-
-
-    if (fault)
-    {
-        // restore svcBuf to its state prior to calling this function
-        svcBuf->bytesWritten = bytesWritten ;
-
-        dataLength = 0 ;
-        write (svcBuf, dataPtr, dataLength) ;
-    }
-
-#endif
-
+    bool fault = ! createEmptyByteArray (svcBuf) ||
+                 ! appendBytes (svcBuf, dataPtr, dataLength) ;
 
     return ! fault ;
+}
+
+
+
+bool serviceBuffer_printf (ServiceBuffer * svcBuf, char * formatSpecifier, ...)
+{
+
+  #if 1
+    (void) svcBuf ;
+    (void) formatSpecifier ;
+
+    return false ;
+
+  #else
+
+    tbd
+
+    allocate the rest of svcBuf
+    use as much of the allocation as needed to printf the string
+    free up the unused remainder of the allocation
+
+    void serialPort_printf (SerialPort * port, String formatSpecifier, ...)
+    {
+        va_list argptr ;
+        char localCopy [MaxLineSize] ;
+
+        va_start  (argptr, formatSpecifier) ;
+        vsnprintf (localCopy, sizeof (localCopy), formatSpecifier, argptr) ;
+        va_end    (argptr) ;
+
+        char * txPtr = localCopy ;
+        (* port->txString) (txPtr) ;
+    }
+
+  #endif
 }
 
 
@@ -208,7 +256,7 @@ typedef struct {
 bool serviceBuffer_putString (ServiceBuffer * svcBuf, char * dataPtr)
 {
     return serviceBuffer_putBytes (svcBuf, (uint8_t *) dataPtr, strlen (dataPtr)) ;
-    // ... exclude the terminating zero
+    // ... exclude the terminating zero from the length
 }
 
 
@@ -260,7 +308,8 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
             svcBuf->bytesRead += dataLength ;
             break ;
 
-        case ServiceBuffer_Bytes :          // tbd handle zero termination
+        case ServiceBuffer_Bytes :
+
             dataPtr    = (uint8_t *) & data.bytes.length ;
             dataLength =       sizeof (data.bytes.length) ;
             memcpy (dataPtr, svcBuf->buffer + svcBuf->bytesRead, dataLength) ;
@@ -268,9 +317,8 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
 
             data.bytes.ptr = svcBuf->buffer + svcBuf->bytesRead ;
             svcBuf->bytesRead += data.bytes.length ;
-          #if 1
-            -- data.bytes.length ;          // exclude zero termination!!
-          #endif
+
+            -- data.bytes.length ;      // exclude zero termination!!
 
             break ;
     }
@@ -383,7 +431,7 @@ bool serviceBuffer_getReal (ServiceBuffer * svcBuf, Real * result)
 
 
 
-bool serviceBuffer_getString (ServiceBuffer * svcBuf, char * * addressOfCharPtr)
+bool serviceBuffer_getByteArray (ServiceBuffer * svcBuf,  ServiceBuffer_ByteArray * byteArray)
 {
     bool fault = false ;
 
@@ -396,7 +444,7 @@ bool serviceBuffer_getString (ServiceBuffer * svcBuf, char * * addressOfCharPtr)
             break ;
 
         case ServiceBuffer_Bytes :
-            * addressOfCharPtr = (char *) nextToken.bytes.ptr ;
+            * byteArray = nextToken.bytes ;
             break ;
     }
 
@@ -429,6 +477,20 @@ bool serviceBuffer_getBytesCopy (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint
             break ;
         }
     }
+
+    return ! fault ;
+}
+
+
+
+bool serviceBuffer_getString (ServiceBuffer * svcBuf, char * * addressOfCharPtr)
+{
+    ServiceBuffer_ByteArray byteArray ;
+
+    bool fault = ! serviceBuffer_getByteArray (svcBuf, & byteArray) ;
+
+    if (! fault)
+        * addressOfCharPtr = (char *) (byteArray.ptr) ;
 
     return ! fault ;
 }

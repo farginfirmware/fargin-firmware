@@ -216,8 +216,6 @@ static bool rxBytes (SerialSvcTxfr * txfr, ServiceBuffer * svcBuf)
 
     bool fault = false ;
 
-    uint16_t byteCount = 0 ;
-
     while (! fault)
     {
         char in [2] ;
@@ -237,10 +235,7 @@ static bool rxBytes (SerialSvcTxfr * txfr, ServiceBuffer * svcBuf)
         uint8_t aByte = (character_hexValue (in [0]) << 4) +
                          character_hexValue (in [1]) ;
 
-        if (++ byteCount == 1)
-            fault = ! serviceBuffer_putBytes (svcBuf, & aByte, sizeof (aByte)) ;
-        else
-            fault = ! serviceBuffer_appendByte (svcBuf, aByte) ;
+        fault = ! serviceBuffer_appendBytes (svcBuf, & aByte, sizeof (aByte)) ;
     }
 
     return ! fault ;
@@ -304,7 +299,8 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
             }
 
             case Prefix_Bytes :
-                fault = ! rxBytes (& txfr, svcBuf) ;
+                fault = ! serviceBuffer_putBytes (svcBuf, NULL, 0) ||   // create empty string
+                        ! rxBytes (& txfr, svcBuf) ;                    // then add 1 byte at a time
                 break ;
 
             case Prefix_Yes :

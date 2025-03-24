@@ -1,17 +1,11 @@
 
-#if 0
-
-    consider modifying this to allow multiple simultaneous Lua states
-
-#endif
-
-
 #include "Lua.h"    // _LUA_H_
 
 #include <errno.h>
 #include <malloc.h>
 #include <math.h>
 #include <thread.h>
+#include <sema.h>       // semaphores
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -23,6 +17,32 @@
 #include "ff.time.h"
 #include "service-buffer.h"
 #include "service.h"
+
+#if 0
+
+    #if 0
+    // use mutex instead of semaphore ?
+
+    static struct {
+        bool    signaled ;
+        mutex_t mutex ;
+    } eventNotification = { false, MUTEX_INIT } ;
+
+    void mutex_lock   (mutex_t *)
+    void mutex_unlock (mutex_t *)
+
+    #else
+
+    static sema_t eventNotification = SEMA_CREATE (1) ;     // must not be 0
+
+    static bool   eventNotification_wasSet (void) { return sema_try_wait (& eventNotification) == 0 ; }
+    static void   eventNotification_wait   (void) {        sema_wait     (& eventNotification) ;      }
+           void   Lua_notifyEvent          (void) {        sema_post     (& eventNotification) ;      }
+
+    #endif
+
+#endif
+
 
 
 static void fatal_error (uint8_t blips)
@@ -270,8 +290,11 @@ static void * lua_thread (void * luaMemSizeArg)
 }
 
 
+
 int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes)
 {
+#define SEMA_CREATE(value)         { (value), SEMA_OK, MUTEX_INIT }
+
     uint8_t             priority =  THREAD_PRIORITY_IDLE - 1 ;  // lowest possible priority
     int                 flags    =  THREAD_CREATE_STACKTEST ;
     thread_task_func_t  task     =  lua_thread ;
