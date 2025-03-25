@@ -29,7 +29,7 @@ typedef enum {
 // includes byte arrays and strings - both are zero-terminated
 typedef struct {
     uint8_t * ptr ;
-    uint16_t  length ;      // not including 0-termination
+    uint16_t  length ;      // NOT including 0-termination
 } ServiceBuffer_ByteArray ;
 
 typedef struct {

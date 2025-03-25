@@ -9,6 +9,30 @@
 
     need to use a mutex?
 
+
+    byte array (including strings)
+        token               ServiceBuffer_Bytes
+        2-byte length       excluding zero termination
+        0                   zero termination
+        end token
+
+    empty byte array (including strings)
+        ServiceBuffer_Bytes
+        0                   length
+        0                   zero termination
+        ServiceBuffer_End
+
+    5-byte array (including strings)
+        ServiceBuffer_Bytes
+        5                   length
+        byte 1
+        byte 2
+        byte 3
+        byte 4
+        byte 5
+        0                   zero termination
+        ServiceBuffer_End
+
 #endif
 
 
@@ -17,8 +41,11 @@ static bool write (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLengt
 {
     // always append ServiceBuffer_End
 
+  #if 0
+    // svcBuf is assumed not to be NULL
     if (svcBuf == NULL)
         return false ;
+  #endif
 
     uint16_t bytesRemaining = svcBuf->bytesCapacity - svcBuf->bytesWritten ;
 
@@ -27,8 +54,11 @@ static bool write (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dataLengt
     if (dataLength + sizeof (endMarker) > bytesRemaining)
         return false ;
 
-    memcpy (svcBuf->buffer + svcBuf->bytesWritten, dataPtr, dataLength) ;
-    svcBuf->bytesWritten += dataLength ;
+    if (dataLength > 0)
+    {
+        memcpy (svcBuf->buffer + svcBuf->bytesWritten, dataPtr, dataLength) ;
+        svcBuf->bytesWritten += dataLength ;
+    }
 
     svcBuf->buffer [svcBuf->bytesWritten] = endMarker ;
 
@@ -120,8 +150,9 @@ static bool createEmptyByteArray (ServiceBuffer * svcBuf)
     // put a ServiceBuffer_Bytes token with a byte array length of 0
     // i.e. an empty byte array
 
+    // there should be a ServiceBuffer_End token at this offset
     uint16_t previousBytesWritten = svcBuf->bytesWritten ;
-    svcBuf->lastTokenOffset = previousBytesWritten ;    // set this every time a new token is added
+    svcBuf->lastTokenOffset = previousBytesWritten ;
 
     uint8_t  dataType        = ServiceBuffer_Bytes ;
     uint16_t dataLength      = 0 ;
@@ -135,7 +166,7 @@ static bool createEmptyByteArray (ServiceBuffer * svcBuf)
     {
         // restore svcBuf to its state prior to calling this function
         svcBuf->bytesWritten = previousBytesWritten ;
-        write (svcBuf, NULL, 0) ;
+        write (svcBuf, NULL, 0) ;   // rewrite the ServiceBuffer_End token
     }
 
     return ! fault ;
@@ -176,7 +207,7 @@ static bool appendBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t dat
         uint16_t  length ;
         uint8_t * lengthPtr = svcBuf->buffer + lastTokenOffset + 1 ;
         memcpy ((uint8_t *) & length, lengthPtr, sizeof (length)) ;     // read it
-        ++ length ;
+        length += dataLength ;
         memcpy (lengthPtr, (uint8_t *) & length, sizeof (length)) ;     // write it
     }
 
@@ -199,7 +230,7 @@ bool serviceBuffer_putBytes (ServiceBuffer * svcBuf, uint8_t * dataPtr, uint16_t
 {
     /*
         This function is used to put both strings and byte arrays - both of
-        which will be written with a 0-termination
+        which will be terminated with a 0
 
         Note!!  dataLength represents the actual amount of data
                 i.e.
@@ -271,7 +302,7 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
         return data ;
     }
 
-    data.type = * (svcBuf->buffer + svcBuf->bytesRead) ;
+    data.type = svcBuf->buffer [svcBuf->bytesRead] ;
 
     if (data.type == ServiceBuffer_End)
         return data ;
@@ -318,7 +349,10 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
             data.bytes.ptr = svcBuf->buffer + svcBuf->bytesRead ;
             svcBuf->bytesRead += data.bytes.length ;
 
+          #if 0
+            no, it is already excluded
             -- data.bytes.length ;      // exclude zero termination!!
+          #endif
 
             break ;
     }
