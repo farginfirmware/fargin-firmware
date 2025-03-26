@@ -14,6 +14,7 @@
     #include "LED0.h"
     #include "BTN0.h"
     #include "ff.gpio.h"
+    #include "test.h"
 
     static RequestProcessingFunction requestServers [] = {
         /// NOTE!! these are tightly coupled to definitions in main.lua
@@ -21,6 +22,7 @@
         /* 1 */     LED0_processRequest,
         /* 2 */     BTN0_processRequest,
         /* 3 */     gpio_processRequest,
+        /* 4 */     test_processRequest,
     } ;
 
 

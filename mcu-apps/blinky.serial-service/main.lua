@@ -7,7 +7,8 @@ service = {
     time = 0,
     led0 = 1,
     btn0 = 2,
-    gpio = 3
+    gpio = 3,
+    test = 4
 }
 
 -- led0 args
@@ -31,6 +32,10 @@ end
 
 local function main()
 
+    local string1 = "string 1"
+    local string2 = "STRING 2"
+    local string3 = "hello 3"
+
     while true do
 
         local period = 1000         -- default 1 Hz blink rate
@@ -43,6 +48,14 @@ local function main()
 
         led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
         led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+
+
+        local testSubcommand = 0
+        _, string1, string2, string3 =
+--          service_request (service.test, testSubcommand, string1, 0, string2, string3)
+            service_request (service.test, testSubcommand, string1,    string2, string3)
+
+        delayMilliseconds (1000)
 
     end
 

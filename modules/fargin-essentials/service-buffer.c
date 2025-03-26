@@ -349,10 +349,9 @@ ServiceBufferToken serviceBuffer_getNextToken (ServiceBuffer * svcBuf)
             data.bytes.ptr = svcBuf->buffer + svcBuf->bytesRead ;
             svcBuf->bytesRead += data.bytes.length ;
 
-          #if 0
-            no, it is already excluded
-            -- data.bytes.length ;      // exclude zero termination!!
-          #endif
+            // increment past the terminating zero
+            ++ svcBuf->bytesRead ;
+            // now, svcBuf->buffer [svcBuf->bytesRead] should be the next token
 
             break ;
     }
