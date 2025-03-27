@@ -13,8 +13,8 @@
 #include <thread.h>
 
 
-static uint8_t  requestBuffer [100] ;   // tbd size
-static uint8_t responseBuffer [100] ;   // tbd size
+static uint8_t  requestBuffer [400] ;   // tbd size
+static uint8_t responseBuffer [400] ;   // tbd size
 
 static ServiceBuffer request, response ;
 

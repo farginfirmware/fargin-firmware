@@ -1,5 +1,7 @@
 
--- tbd add coroutines ?
+-- this variable is intended to be modified via serial service,
+-- so it must not declared local
+blink = { auto = true, msecPeriod = 1000, duty = 0.1 }
 
 
 -- services tightly coupled to requestServers[] in main.c
@@ -34,28 +36,51 @@ local function main()
 
     local string1 = "string 1"
     local string2 = "STRING 2"
-    local string3 = "hello 3"
+    local string3 = "hello  3"
+
+    local count = 10
 
     while true do
 
-        local period = 1000         -- default 1 Hz blink rate
+        local period = blink.msecPeriod
+
         if buttonPressed() then
             period = period / 2     -- double the rate
         end
 
-        local milliseconds_ON  = period * 0.20      -- 20% duty cycle
+        local milliseconds_ON  = period * blink.duty
         local milliseconds_OFF = period - milliseconds_ON
 
-        led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
-        led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+        if blink.auto then
+            led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
+            led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
+        end
+
+        count = count - 1
+        local f
+
+        if count == 0 then
+            f = load ("blink.msecPeriod =  500")    -- returns a function
+            f()                                     -- execute the function
+        end
+
+        if count <= -10 then
+            count = 10
+            f = load ("blink.msecPeriod = 1000")    -- returns a function
+            f()                                     -- execute the function
+        end
 
 
         local testSubcommand = 0
+        local anythingButAString = 0
         _, string1, string2, string3 =
---          service_request (service.test, testSubcommand, string1, 0, string2, string3)
-            service_request (service.test, testSubcommand, string1,    string2, string3)
+            service_request (service.test, testSubcommand,
+                string1,
+                anythingButAString,
+                string2,
+                string3)
 
-        delayMilliseconds (1000)
+--      delayMilliseconds (1000)
 
     end
 

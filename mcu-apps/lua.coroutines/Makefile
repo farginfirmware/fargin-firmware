@@ -2,7 +2,7 @@
 APPLICATION = lua.coroutines
 
 # the gpio-related code in main.lua is written for:
-BOARD ?= adafruit-grand-central-m4-express
+BOARD ?= makerdiary-nrf52840-mdk-iot-kit
 
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
