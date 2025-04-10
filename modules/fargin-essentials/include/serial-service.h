@@ -8,7 +8,7 @@
     #include <limits.h>
     #include <stdbool.h>
     #include <stdint.h>
-    typedef double Real ;
+    typedef float Real ;
 #endif
 
 

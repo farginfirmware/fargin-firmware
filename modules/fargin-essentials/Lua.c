@@ -86,8 +86,8 @@ static bool getArg (lua_State * L, uint8_t argIndex)
     {
         case LUA_TNUMBER :
         {
-            double d = lua_tonumber (L, argIndex) ;
-            double dAsInt = floor (d) ;
+            float d = lua_tonumber (L, argIndex) ;
+            float dAsInt = floor (d) ;
 
             if ((dAsInt == d) && (dAsInt >= 0) && (dAsInt <= UINT32_MAX))
                 fault |= ! serviceBuffer_putUnsigned32 (& request, dAsInt) ;
