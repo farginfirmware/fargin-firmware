@@ -1,0 +1,10 @@
+
+sparkfun-thing-plus-samd51
+
+config BOARD
+    default "sparkfun-thing-plus-samd51" if BOARD_SPARKFUN_THING_PLUS_SAMD51
+
+config BOARD_SPARKFUN_THING_PLUS_SAMD51
+    bool
+    default y
+    select CPU_MODEL_SAMD51J20A
