@@ -40,23 +40,22 @@
 #endif
 
 
-//    uX.....XX           32-bit Unsigned integer (1 to 8 hex nybbles)
-//    sX.....XX           32-bit   Signed integer (1 to 8 hex nybbles
-//                                                 bit 3 of first nybble is the sign bit)
-//    rXXXXXXXXXXXXXXXX   64-bit Double  (16 hex nybbles exactly)
-//    bXX...XXXX          Byte array (even number of hex nybbles) ; same for string ; exclude terminating 0
+//    Ux.....xx   32-bit Unsigned integer (1 to 8 hex nybbles)
+//    Ix.....xx   32-bit   signed Integer (1 to 8 hex nybbles - bit 3 of first nybble is the sign bit)
+//    Fx.....xx   32-bit Float/real       (1 to 8 hex nybbles ... almost always 8)
+//    Bxx..xxxx   Byte array or string    (even number of hex nybbles) ; exclude terminating 0
 //
-//    y                   Yes     True
-//    n                   No/Nil  False (in Lua, false and nil are false - everything else is true)
+//    T           True
+//    N           Nil/False (in Lua, false and nil are false - everything else is true)
 //
-//    cXXXX               2-byte checksum (4 hex nybbles)
+//    Cxxxx       2-byte Checksum         (1 to 4 hex nybbles)
 //
 #define Prefix_Unsigned   'u'
-#define Prefix_Signed     's'
-#define Prefix_Real       'r'
+#define Prefix_Signed     'i'
+#define Prefix_Real       'f'
 #define Prefix_Bytes      'b'
-#define Prefix_Yes        'y'
-#define Prefix_No         'n'
+#define Prefix_True       't'
+#define Prefix_Nil        'n'
 #define Prefix_Checksum   'c'
 
 #define MessagePrefix     '>'
@@ -303,25 +302,23 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
                         ! rxBytes (& txfr, svcBuf) ;                    // then add 1 byte at a time
                 break ;
 
-            case Prefix_Yes :
+            case Prefix_True :
                 fault = ! serviceBuffer_putBoolean (svcBuf, true) ||
                         ! (rxChar (& txfr) == ' ') ;
                 break ;
 
-            case Prefix_No :
+            case Prefix_Nil :
                 fault = ! serviceBuffer_putBoolean (svcBuf, false) ||
                         ! (rxChar (& txfr) == ' ') ;
                 break ;
 
             case Prefix_Checksum :
             {
-                uint32_t cksum ;
-                fault = ! rxUnsigned (& txfr, & cksum) ;
+                uint16_t expectedChecksum = txfr.checksum ;
 
-              #if 1
-                // tbd
-                fault = false ;
-              #endif
+                uint32_t receivedChecksum ;
+                fault = ! rxUnsigned (& txfr, & receivedChecksum) ||
+                        ! (receivedChecksum == expectedChecksum) ;
 
                 return ! fault ;
             }
@@ -417,14 +414,14 @@ static void tx_Real (SerialSvcTxfr * txfr, Real data)
 static void tx_Boolean (SerialSvcTxfr * txfr, bool data)
 {
     txChar (txfr, ' ') ;
-    txChar (txfr, data ? Prefix_Yes : Prefix_No) ;
+    txChar (txfr, data ? Prefix_True : Prefix_Nil) ;
 }
 
 
 static void tx_Nil (SerialSvcTxfr * txfr)
 {
     txChar (txfr, ' ') ;
-    txChar (txfr, Prefix_No) ;
+    txChar (txfr, Prefix_Nil) ;
 }
 
 
@@ -444,6 +441,8 @@ static void tx_Bytes (SerialSvcTxfr * txfr, uint8_t * dataPtr, uint16_t dataLeng
 
 static void tx_Checksum (SerialSvcTxfr * txfr)
 {
+    // the checksum is up to and including Prefix_Checksum, but not the 1 to 4 bytes that follow
+
     txChar (txfr, ' ') ;
     txChar (txfr, Prefix_Checksum) ;
 

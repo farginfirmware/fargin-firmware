@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef double Real ;
+typedef float Real ;
 
 #define ArrayLength(anArray) (sizeof(anArray) / sizeof((anArray) [0]))
 

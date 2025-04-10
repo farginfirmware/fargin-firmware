@@ -8,11 +8,19 @@
 #include <string.h>
 
 
-// _SERVICE_BUFFER_H_
+    // these constants are tightly coupled to Lua variables
+    //
+    #define   EchoString    0       // echo the string(s) in the request buffer
+    #define     RxString    1       // make a local copy of the string in the request buffer
+    #define ReadRxString    2       // return the local copy
 
 
 bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 {
+    uint8_t       rxData [500] ;    // increase if necessary
+    ServiceBuffer rxBuffer ;
+    serviceBuffer_initialize (& rxBuffer, rxData, sizeof (rxData)) ;
+
     uint8_t subCommand ;
 
     bool fault = ! serviceBuffer_getByte (request, & subCommand) ;
@@ -26,9 +34,10 @@ bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
             fault = true ;
             break ;
 
-        case 0 :
+
+        case EchoString :
         {
-            // test string args and results
+            // echo all string args with the case of the 1st character toggled
 
             while (true)        // break if end token
             {
@@ -48,6 +57,46 @@ bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 
                 fault = ! serviceBuffer_putString (response, aString) ;
             }
+
+            break ;
+        }
+
+
+        case RxString :
+        {
+            // make a copy the given string
+
+            // get it from the request buffer
+            ServiceBufferToken nextToken = serviceBuffer_getNextToken (request) ;
+
+            if (nextToken.type != ServiceBuffer_Bytes)
+                break ;
+
+            char * aString = (char *) nextToken.bytes.ptr ;
+
+            // copy it to the local service buffer
+            serviceBuffer_reset (& rxBuffer) ;
+            fault = ! serviceBuffer_putString (& rxBuffer, aString) ;
+
+            break ;
+        }
+
+
+        case ReadRxString :
+        {
+            // return the string that was copied in the RxString case ;
+            // then clear the RxString
+
+            // get it from the local service buffer
+            ServiceBufferToken nextToken = serviceBuffer_getNextToken (& rxBuffer) ;
+
+            if (nextToken.type != ServiceBuffer_Bytes)
+                break ;
+
+            char * aString = (char *) nextToken.bytes.ptr ;
+
+            // copy it to the response buffer
+            fault = ! serviceBuffer_putString (response, aString) ;
 
             break ;
         }
