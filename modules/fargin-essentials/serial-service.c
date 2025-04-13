@@ -48,7 +48,7 @@
 //    T           True
 //    N           Nil/False (in Lua, false and nil are false - everything else is true)
 //
-//    Cxxxx       2-byte Checksum         (1 to 4 hex nybbles)
+//    Cxxx        Checksum modulo 0x1000  (1 to 3 hex nybbles)
 //
 #define Prefix_Unsigned   'u'
 #define Prefix_Signed     'i'
@@ -106,7 +106,8 @@ static bool rxHexString (SerialSvcTxfr * txfr, char * digitString, uint8_t maxLe
     {
         char nextChar = character_toLower (rxChar (txfr)) ;
 
-        if (nextChar == ' ')
+        // detect whitespace
+        if ((nextChar == ' ') || (nextChar == '\r') || (nextChar == '\n'))
             break ;
 
         fault = ! character_isHexDigit (nextChar) ;
@@ -253,7 +254,7 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
     while (rxChar (& txfr) != MessagePrefix) {}
 
     serviceBuffer_reset (svcBuf) ;
-    txfr.checksum = 0 ;
+    txfr.checksum = MessagePrefix ;
 
 
     while (! fault)
@@ -268,7 +269,7 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
             case MessagePrefix :
             {
                 serviceBuffer_reset (svcBuf) ;
-                txfr.checksum = 0 ;
+                txfr.checksum = MessagePrefix ;
                 fault = false ;
                 break ;
             }
@@ -315,6 +316,7 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
             case Prefix_Checksum :
             {
                 uint16_t expectedChecksum = txfr.checksum ;
+                expectedChecksum &= 0xfff ; // modulo 0x1000
 
                 uint32_t receivedChecksum ;
                 fault = ! rxUnsigned (& txfr, & receivedChecksum) ||
@@ -441,12 +443,13 @@ static void tx_Bytes (SerialSvcTxfr * txfr, uint8_t * dataPtr, uint16_t dataLeng
 
 static void tx_Checksum (SerialSvcTxfr * txfr)
 {
-    // the checksum is up to and including Prefix_Checksum, but not the 1 to 4 bytes that follow
+    // the checksum is up to and including Prefix_Checksum, but not the 1 to 3 bytes that follow
 
     txChar (txfr, ' ') ;
     txChar (txfr, Prefix_Checksum) ;
 
     uint16_t checksumCopy = txfr->checksum ;
+    checksumCopy &= 0xfff ;     // modulo 0x1000 for max 3 nybbles
 
     tx_Bitfield32 (txfr, checksumCopy) ;
 

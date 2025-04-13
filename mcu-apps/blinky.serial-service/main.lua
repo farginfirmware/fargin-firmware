@@ -1,7 +1,7 @@
 
 -- this variable is intended to be modified via serial service,
 -- so it must not declared local
-blink = { auto = false, msecPeriod = 1000, duty = 0.25 }
+blink = { auto = true, msecPeriod = 1000, duty = 0.1 }
 
 
 -- services tightly coupled to requestServers[] in main.c

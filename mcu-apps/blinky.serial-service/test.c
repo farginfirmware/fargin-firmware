@@ -48,8 +48,10 @@ bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 
                 char * aString = (char *) nextToken.bytes.ptr ;
 
+            #if 0
                 stdio_write (aString, strlen (aString)) ;
                 stdio_write ("\r\n", 2) ;
+            #endif
 
                 // toggle the case of the 1st character
                 if (* aString >= 'a')  * aString -= 0x20 ;
