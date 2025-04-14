@@ -37,6 +37,15 @@ local function main()
 
     while true do
 
+        delayMilliseconds (1000)
+
+        -- read and execute script
+        local rx = test_getRxString ()
+        if rx then
+            local fn = load (rx)    -- load() turns rx into a function
+            fn()                    -- execute the function
+        end
+
         if blink.auto then
 
             local period = blink.msecPeriod
@@ -46,18 +55,6 @@ local function main()
 
             led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
             led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
-
-        else
-
-            delayMilliseconds (1000)
-
-            -- read and execute script
-            local rx = test_getRxString ()
-            if rx then
-                local fn = load (rx)    -- load() turns rx into a function
-                fn()                    -- execute the function
-            end
-
 
         end
 

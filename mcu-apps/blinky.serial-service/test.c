@@ -14,12 +14,18 @@
     #define     RxString    1       // make a local copy of the string in the request buffer
     #define ReadRxString    2       // return the local copy
 
+static uint8_t       rxData [500] ;    // increase if necessary
+static ServiceBuffer rxBuffer ;
+static bool          rxInitialized = false ;
+
 
 bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 {
-    uint8_t       rxData [500] ;    // increase if necessary
-    ServiceBuffer rxBuffer ;
-    serviceBuffer_initialize (& rxBuffer, rxData, sizeof (rxData)) ;
+    if (! rxInitialized)
+    {
+        serviceBuffer_initialize (& rxBuffer, rxData, sizeof (rxData)) ;
+        rxInitialized = true ;
+    }
 
     uint8_t subCommand ;
 
@@ -72,7 +78,10 @@ bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
             ServiceBufferToken nextToken = serviceBuffer_getNextToken (request) ;
 
             if (nextToken.type != ServiceBuffer_Bytes)
+            {
+                fault = true ;
                 break ;
+            }
 
             char * aString = (char *) nextToken.bytes.ptr ;
 
@@ -93,7 +102,10 @@ bool test_processRequest (ServiceBuffer * request, ServiceBuffer * response)
             ServiceBufferToken nextToken = serviceBuffer_getNextToken (& rxBuffer) ;
 
             if (nextToken.type != ServiceBuffer_Bytes)
+            {
+                fault = true ;
                 break ;
+            }
 
             char * aString = (char *) nextToken.bytes.ptr ;
 
