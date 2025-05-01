@@ -13,8 +13,15 @@
 
 #include "blob/main.lua.h"  // Lua startup code
 
-#include "board.h"
-#include "ff.time.h"
+#if defined (BOARD_NATIVE32) || defined (BOARD_NATIVE64)
+   #define   BOARD_NATIVE
+#endif
+
+#if ! defined (BOARD_NATIVE)
+  #include "board.h"
+  #include "ff.time.h"
+#endif
+
 #include "service-buffer.h"
 #include "service.h"
 
@@ -50,6 +57,9 @@ static void fatal_error (uint8_t blips)
     // provide visual error indication ;
     // there is no return from this function
 
+  #if defined (BOARD_NATIVE)
+    (void) blips ;
+  #else
     while (1)
     {
       #ifdef LED0_PIN
@@ -63,6 +73,7 @@ static void fatal_error (uint8_t blips)
 
         time_delayMilliseconds (1000) ;
     }
+  #endif
 }
 
 
@@ -184,9 +195,9 @@ static int service_request (lua_State * L)
     // for the test app running on the PC, the request is transmitted via the
     // serial port to the target mcu for processing
 
-    tbd - besides the returned response, a result boolean is also needed
 
-    tbd
+    // tbd - besides the returned response, a result boolean is also needed
+
 
   #else
 
@@ -238,14 +249,15 @@ static void C_from_Lua_initialize (lua_State * L)
 }
 
 
+typedef struct { uint32_t memSize ; } lua_thread_args ;
 
-static void * lua_thread (void * luaMemSizeArg)
+static void * lua_thread (void * threadArgs)
 {
     serviceBuffer_initialize (&  request,  requestBuffer, sizeof ( requestBuffer)) ;
     serviceBuffer_initialize (& response, responseBuffer, sizeof (responseBuffer)) ;
 
-
-    uint32_t luaMemSize = (uint32_t) luaMemSizeArg ;
+    lua_thread_args *     argsPtr = (lua_thread_args *) threadArgs ;
+    uint32_t luaMemSize = argsPtr->memSize ;
 
     char * lua_mem = malloc (luaMemSize) ;
     if (lua_mem == NULL)
@@ -293,13 +305,15 @@ static void * lua_thread (void * luaMemSizeArg)
 
 int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes)
 {
-#define SEMA_CREATE(value)         { (value), SEMA_OK, MUTEX_INIT }
+    #define SEMA_CREATE(value)         { (value), SEMA_OK, MUTEX_INIT }
 
     uint8_t             priority =  THREAD_PRIORITY_IDLE - 1 ;  // lowest possible priority
     int                 flags    =  THREAD_CREATE_STACKTEST ;
     thread_task_func_t  task     =  lua_thread ;
-    void *              arg      =  (void *) heapBytes ;
     const char *        name     = "Lua" ;
+
+    static lua_thread_args args ;
+    args.memSize = heapBytes ;
 
     char * stack = malloc (stackBytes) ;
     if (stack == NULL)
@@ -308,7 +322,7 @@ int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes)
         return -1 ;
     }
 
-    kernel_pid_t pid = thread_create (stack, stackBytes, priority, flags, task, arg, name) ;
+    kernel_pid_t pid = thread_create (stack, stackBytes, priority, flags, task, & args, name) ;
 
     return pid_is_valid (pid) ;
 }

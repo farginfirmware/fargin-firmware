@@ -19,6 +19,8 @@ void service_initialize (RequestProcessingFunction * requestServerPtr, uint8_t n
 
 bool service_processRequest (ServiceBuffer * request, ServiceBuffer * response)
 {
+    // tbd use a mutex
+
     serviceBuffer_reset (response) ;
 
     uint8_t subLevel ;

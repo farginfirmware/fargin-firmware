@@ -6,6 +6,9 @@
 
 #include <string.h>
 
+#if 0
+#include <stdio.h>
+#endif
 
 #if 0
 
@@ -321,6 +324,10 @@ bool serialService_receive (ServiceBuffer * svcBuf, RxFunctionPtr rxFnPtr)
                 uint32_t receivedChecksum ;
                 fault = ! rxUnsigned (& txfr, & receivedChecksum) ||
                         ! (receivedChecksum == expectedChecksum) ;
+            #if 0
+                if (fault)
+                    printf ("expected: %u  received: %lu\r\n", expectedChecksum, receivedChecksum) ;
+            #endif
 
                 return ! fault ;
             }
@@ -453,7 +460,7 @@ static void tx_Checksum (SerialSvcTxfr * txfr)
 
     tx_Bitfield32 (txfr, checksumCopy) ;
 
-    txChar (txfr, ' ') ;
+    txChar (txfr, '\r') ;
     txChar (txfr, '\n') ;
 }
 

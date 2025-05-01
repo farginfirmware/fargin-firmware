@@ -61,7 +61,7 @@ static void * stdio_thread (void * arg)
 
         if (fault)
         {
-            printf ("serialService_receive() error\n") ;
+            printf ("serial protocol error\r\n") ;
             continue ;
         }
 

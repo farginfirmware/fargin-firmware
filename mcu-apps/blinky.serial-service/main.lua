@@ -1,7 +1,7 @@
 
 -- this variable is intended to be modified via serial service,
--- so it must not declared local
-blink = { auto = true, msecPeriod = 1000, duty = 0.1 }
+-- so it must not be declared local
+blink = { count = 10, msecPeriod = 1000, duty = 0.1 }
 
 
 -- services tightly coupled to requestServers[] in main.c
@@ -29,24 +29,18 @@ end
 function test_getRxString ()
     _, rxString = service_request (service.test, testType.readSerialRxString)
     return rxString
-    -- tbd
 end
 
 
 local function main()
 
+    delayMilliseconds (1000)
+
     while true do
 
-        delayMilliseconds (1000)
+        if blink.count > 0 then
 
-        -- read and execute script
-        local rx = test_getRxString ()
-        if rx then
-            local fn = load (rx)    -- load() turns rx into a function
-            fn()                    -- execute the function
-        end
-
-        if blink.auto then
+            blink.count = blink.count - 1
 
             local period = blink.msecPeriod
 
@@ -56,6 +50,15 @@ local function main()
             led0_set (ledState.on)      delayMilliseconds (milliseconds_ON)
             led0_set (ledState.off)     delayMilliseconds (milliseconds_OFF)
 
+        else
+            delayMilliseconds (1000)
+        end
+
+        -- read and execute script, if any
+        local rx = test_getRxString ()
+        if rx then
+            local fn = load (rx)    -- load() turns rx into a function
+            fn()                    -- execute the function
         end
 
     end
