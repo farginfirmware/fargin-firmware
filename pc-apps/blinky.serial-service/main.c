@@ -2,6 +2,10 @@
 /*
     invocation:
         $ ./bin/native64/blinky.serial-service.elf -c /dev/ttyACM0
+
+
+    ttyACM0 is working ... now need to send serial commands from Lua
+
 */
 
 #include "Lua.h"
@@ -13,11 +17,20 @@
 
 #include "board.h"
 #include "periph/uart.h"
-
+#include "tsrb.h"
 #include "timex.h"
 #include "ztimer.h"
 
 #include <string.h>
+
+
+static uart_t uart = 0 ;    // usually /dev/ttyACM0 on my pc
+
+static struct {
+    tsrb_t  ringBuffer ;
+    uint8_t data [1024] ;   // must be a power of 2
+} rx ;
+
 
 
 static void time_delayMilliseconds (uint16_t milliseconds)
@@ -32,19 +45,39 @@ static void time_delayMilliseconds (uint16_t milliseconds)
 }
 
 
-static void rxCallback (void * arg, uint8_t data)
+static void rxCallback (void * arg, uint8_t aByte)
 {
     (void) arg ;
-    (void) data ;
+    tsrb_add_one (& rx.ringBuffer, aByte);
+}
+
+static char rxChar (void)
+{
+    while (1)
+    {
+        int getOne = tsrb_get_one (& rx.ringBuffer) ;
+        if (getOne >= 0)
+            return (char) getOne ;
+        time_delayMilliseconds (1) ;
+    }
+}
+
+static void txChar (char tx)
+{
+    uart_write (uart, (uint8_t *) & tx, sizeof(tx)) ;
 }
 
 
 int main (void)
 {
 
+    // init rx ring buffer
+    tsrb_init  (& rx.ringBuffer, rx.data, sizeof (rx.data)) ;
+    tsrb_clear (& rx.ringBuffer) ;
+
+
     printf ("UART_NUMOF = %d\r\n", UART_NUMOF) ;
 
-    uart_t       uart  = 0 ;        // usually /dev/ttyACM0 on my pc
     uint32_t     baud  = 115200 ;
     uart_rx_cb_t rx_cb = rxCallback ;
     void *       arg   = NULL ;
@@ -54,16 +87,13 @@ int main (void)
 
     switch (result)
     {
-        case 0 :
-            break ;
-        case UART_NODEV :
-            puts ("uart_init() returned UART_NODEV\r\n") ;
-            return result ;
-        default :
-            return result ;
+        case 0          : break ;
+        case UART_NODEV : puts ("uart_init() returned UART_NODEV\r\n") ; return result ;
+        default         : return result ;
     }
 
 
+#if 0
     int loopCount = 2 ;
     while (loopCount --)
     {
@@ -104,12 +134,14 @@ int main (void)
     time_delayMilliseconds (500) ;  uart_write (uart, (uint8_t *)  duty,  strlen ( duty)) ;
 
     return 0 ;
+#endif
 
 
     // this is running on a PC, so there is plenty of ram
     const uint16_t LuaStackBytes = 10000 ;
     const uint32_t LuaHeapBytes  = 60000 ;
-    Lua_initialize (LuaStackBytes, LuaHeapBytes) ;
+    Lua_initialize (LuaStackBytes, LuaHeapBytes, rxChar, txChar) ;
+
 
     thread_sleep () ;
 

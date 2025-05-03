@@ -2,7 +2,7 @@
 This folder contains sample projects which are intended to demonstrate how the
 fargin firmware framework works.
 
-The following mcu apps are ready to run. Each has its own ReadMe.md file.
+The following mcu apps are ready to run.
  - blinky.minimal           minimal fargin framework
  - blinky.dotstar           works with boards with a dotstar LED
  - blinky.serial-service    access mcu services from pc via usb

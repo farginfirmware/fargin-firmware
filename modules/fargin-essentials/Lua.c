@@ -13,10 +13,6 @@
 
 #include "blob/main.lua.h"  // Lua startup code
 
-#if defined (BOARD_NATIVE32) || defined (BOARD_NATIVE64)
-   #define   BOARD_NATIVE
-#endif
-
 #if ! defined (BOARD_NATIVE)
   #include "board.h"
   #include "ff.time.h"
@@ -24,6 +20,13 @@
 
 #include "service-buffer.h"
 #include "service.h"
+
+#if defined (BOARD_NATIVE)
+  #include "serial-service.h"
+  static TxFunctionPtr txPtr ;
+  static RxFunctionPtr rxPtr ;
+#endif
+
 
 #if 0
 
@@ -195,9 +198,8 @@ static int service_request (lua_State * L)
     // for the test app running on the PC, the request is transmitted via the
     // serial port to the target mcu for processing
 
-
-    // tbd - besides the returned response, a result boolean is also needed
-
+    serialService_transmitRequest (& request,  txPtr) ;
+    serialService_receive         (& response, rxPtr) ;
 
   #else
 
@@ -303,9 +305,18 @@ static void * lua_thread (void * threadArgs)
 
 
 
-int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes)
+#if defined (BOARD_NATIVE)
+  int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes, RxFunctionPtr rx, TxFunctionPtr tx)
+#else
+  int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes)
+#endif
 {
     #define SEMA_CREATE(value)         { (value), SEMA_OK, MUTEX_INIT }
+
+  #if defined (BOARD_NATIVE)
+    rxPtr = rx ;
+    txPtr = tx ;
+  #endif
 
     uint8_t             priority =  THREAD_PRIORITY_IDLE - 1 ;  // lowest possible priority
     int                 flags    =  THREAD_CREATE_STACKTEST ;

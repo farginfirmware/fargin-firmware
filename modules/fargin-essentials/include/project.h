@@ -12,4 +12,8 @@ typedef float Real ;
 
 typedef void (* FunctionPointer) (void) ;
 
+#if defined (BOARD_NATIVE32) || defined (BOARD_NATIVE64)
+   #define   BOARD_NATIVE
+#endif
+
 #endif

@@ -5,7 +5,7 @@ This repository is for the development of the
 for microcontrollers.
 
 Fargin Firmware is built on top of [Lua](http://www.lua.org/about.html) and
-[RIOT OS](http://www.riot-os.org) ("The friendly Operating System for the
+[RIOT OS](http://www.riot-os.org) ("The Friendly Operating System for the
 Internet of Things").
 
 Lua provides:
@@ -13,7 +13,7 @@ Lua provides:
 
 RIOT OS provides:
  - portability
- - ease of use
+ - ease of real-time programming
 
 What's so ~~great~~ ~~special~~ different about this firmware framework?
 
@@ -26,9 +26,9 @@ What's so ~~great~~ ~~special~~ different about this firmware framework?
   - obviates the need for a bootloader
 
 - the application is written in Lua
-  - bytecode compiler and interpreter are built into the native code
+  - bytecode compiler and interpreter are built into the native mcu code
   - application source is stored in a file system on the target
-  - may be modified on-the-fly (i.e. without having to do a reset)
+  - may be modified on-the-fly (i.e. without having to reset the mcu or restart the app)
 
 - Lua app development is on a PC
   - PC-based Lua app connects to a serial interface on the target
@@ -39,21 +39,7 @@ What's so ~~great~~ ~~special~~ different about this firmware framework?
     - the target returns service responses to the pc
   - download Lua source to the target for subsequent stand-alone running
 
-
-examples in folder mcu-apps/
-  - blinky.minimal
-  - gpio
-  - gpio.objects
-  - lua.coroutines
-  - blinky.dotstar
-  - blinky.serial-service
-  - blinky.full-framework
-  - etc (tbd)
-
-folder pc-apps
-  - tbd
-
 external references:
-- [RIOT OS 2025.01](https://github.com/RIOT-OS/RIOT/tree/2025.01-branch) which includes
+- [RIOT OS 2025.04](https://github.com/RIOT-OS/RIOT/tree/2025.04-branch) which includes
 - a [Lua 5.3](https://www.lua.org/versions.html#5.3) package
 

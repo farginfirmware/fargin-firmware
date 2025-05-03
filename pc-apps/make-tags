@@ -1,0 +1,13 @@
+
+ctags   *.h    *.c                                          \
+        ../../modules/fargin-essentials/include/*.h         \
+        ../../modules/fargin-essentials/*.c                 \
+        ../../modules/RTOS-adapter/include/*.h              \
+        ../../modules/RTOS-adapter/*.c                      \
+        ../../modules/app-independent-utils/include/*.h     \
+        ../../modules/app-independent-utils/*.c             \
+        ../../modules/dotstar/include/*.h                   \
+        ../../modules/dotstar/*.c                           \
+                                                            \
+        ~/Projects/RIOT/drivers/include/periph/*.h          \
+

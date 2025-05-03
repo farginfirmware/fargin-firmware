@@ -1,5 +1,5 @@
 
-"blinky.minimal"
+see [blinky.minimal](https://www.farginfirmware.com/home/how-to/blink-an-led/blinky-minimal)
 
 This app merely blinks an LED (LED0). Pressing a button (BTN0, if it exists)
 doubles the blink rate.

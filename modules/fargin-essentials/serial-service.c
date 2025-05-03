@@ -466,7 +466,10 @@ static void tx_Checksum (SerialSvcTxfr * txfr)
 
 
 
-bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr, bool serviceResult)
+static bool transmit
+   (ServiceBuffer * svcBuf,
+    TxFunctionPtr   txFnPtr,
+    bool serviceResultIncluded, bool serviceResult)
 {
     // this is going to be a lot easier than the complementary receive function
 
@@ -478,7 +481,8 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr, bool
 
     txChar (& txfr, MessagePrefix) ;
 
-    tx_Boolean (& txfr, serviceResult) ;
+    if (serviceResultIncluded)
+        tx_Boolean (& txfr, serviceResult) ;
 
     while (! fault)
     {
@@ -505,5 +509,20 @@ bool serialService_transmit (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr, bool
     }
 
     return ! fault ;
+}
+
+
+bool serialService_transmitResponse (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr, bool serviceResult)
+{
+    bool serviceResultIncluded = true ;
+    return transmit (svcBuf, txFnPtr, serviceResultIncluded, serviceResult) ;
+}
+
+
+bool serialService_transmitRequest (ServiceBuffer * svcBuf, TxFunctionPtr txFnPtr)
+{
+    bool serviceResultIncluded = false ;
+    bool serviceResult         = false ;    // n/a
+    return transmit (svcBuf, txFnPtr, serviceResultIncluded, serviceResult) ;
 }
 

@@ -1,7 +1,7 @@
 
 "gpio"
 
-This app builds upon the "blinky" app with the introduction of gpio services
+This app builds upon the "blinky.minimal" app with the introduction of gpio services
  - any gpio bit may be initialized and configured from Lua ; in this case:
    - a button (or any port pin that can be pulled low)
    - a 2nd LED (i.e. in addition to LED0)

@@ -7,11 +7,9 @@ BOARD ?= adafruit-grand-central-m4-express
 EXTERNAL_MODULE_DIRS ?= ../../modules/
 EXTERNAL_BOARD_DIRS  ?= ../../boards/
 
-ifneq ($(BOARD),native)
-  # This stack size is large enough to run Lua print() functions of
-  # various lengths. Other functions untested.
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
-endif
+# This stack size is large enough to run Lua print() functions of
+# various lengths. Other functions untested.
+CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
 
 #FarginFirmware modules
 USEMODULE += fargin-essentials

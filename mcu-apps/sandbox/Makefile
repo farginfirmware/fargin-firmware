@@ -17,12 +17,9 @@ RIOTBASE ?= $(CURDIR)/../..
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-ifneq ($(BOARD),native)
-  # This stack size is large enough to run Lua print() functions of
-  # various lengths. Other functions untested.
-# CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+8192)'
-endif
+# This stack size is large enough to run Lua print() functions of
+# various lengths. Other functions untested.
+CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
 
 USEMODULE += stdio_cdc_acm        # can't use this when using stdio_nimble below
 USEMODULE += shell

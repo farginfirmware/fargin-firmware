@@ -67,7 +67,7 @@ static void * stdio_thread (void * arg)
 
         bool result = service_processRequest (& request, & response) ;
 
-        serialService_transmit (& response, txChar, result) ;
+        serialService_transmitResponse (& response, txChar, result) ;
     }
 
 

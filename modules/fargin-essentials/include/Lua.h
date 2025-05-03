@@ -13,7 +13,12 @@
 //    etc, etc
 void Lua_notifyEvent (void) ;
 
+#if defined (BOARD_NATIVE)
+    #include "serial-service.h"
+    int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes, RxFunctionPtr, TxFunctionPtr) ;
+#else
+    int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes) ;
+#endif
 
-int Lua_initialize (uint16_t stackBytes, uint32_t heapBytes) ;
 
 #endif
